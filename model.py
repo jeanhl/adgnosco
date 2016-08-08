@@ -15,40 +15,79 @@ db = SQLAlchemy()
 class Entrance(db.Model):
     """Individual entrances of a building."""
 
-    __tablename__ = "entrance"
+    __tablename__ = "entrances"
 
     entrance_id = db.Column(db.Integer, primary_key=True)
     entrance_name = db.Column(db.String(20), nullable=False)
-    building_id = db.Column(db.Integer, nullable=False)
+    building_id = db.Column(db.Integer, db.ForeignKey('buildings.building_id'), nullable=False)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "< Entr_id:%d  Entr_name:%s  Bld_id:%s  >" % (self.entrance_id, 
+        return "< Entr_id:%d  Entr_name:%s  Bld_id:%s  >" % (self.entrance_id,
                                                              self.entrance_name,
                                                              self.building_id)
-    # Define relationship to movie
-    movie = db.relationship("Movie",
-                            backref=db.backref("user", order_by=somethingsomething))
 
-    class Building(db.Model):
+class Building(db.Model):
     """Individual Buildings in a campus."""
 
-    __tablename__ = "building"
+    __tablename__ = "buildings"
 
     building_id = db.Column(db.Integer, primary_key=True)
     building_name = db.Column(db.String(20), nullable=False)
-    building_address = db.Column(db.String, nullable=False)
+    building_address = db.Column(db.String(300), nullable=False)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "< Entr_id:%d  Entr_name:%s  Bld_id:%s  >" % (self.entrance_id, 
-                                                             self.entrance_name,
-                                                             self.building_id)
-    # Define relationship to movie
-    movie = db.relationship("Movie",
-                            backref=db.backref("user", order_by=somethingsomething))
+        return "< Building id: %d  Building name: %s  Building add: %s  >" % (self.building_id,
+                                                                              self.building_name,
+                                                                              self.building_address)
+
+class Personnel(db.Model):
+    """ People who have access to the building. """
+
+    __tablename__ = "personnels"
+
+    person_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    person_name = db.Column(db.String(50), nullable=False)
+    keycode = db.Column(db.Integer, nullable=False)
+    manager = db.Column(db.Boolean, nullable=False)
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "< Person id: %d  Person name: %s   Keycode: %d  Manager: %s  >" % (self.person_id,
+                                                                                   self.person_name,
+                                                                                   self.keycode,
+                                                                                   self.manager)
+class Entries(db.Model):
+    """ People who have access to the building. """
+
+    __tablename__ = "entries"
+
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    person_id = db.Column(db.Integer, db.ForeignKey('personnels.person_id'), nullable=False)
+    entrance_id = db.Column(db.Integer, db.ForeignKey('entrances.entrance_id'), nullable=False)
+    building_id = db.Column(db.Integer, db.ForeignKey('buildings.building_id'), nullable=False)
+    datentime = db.Column(db.String(200), nullable=False)
+
+    # Defining relationships to person, entrance, building
+    person = db.relationship("Personnel",
+                             backref=db.backref("entry"))
+    entrance = db.relationship("Entrance",
+                               backref=db.backref("entry"))
+    building = db.relationship("Building",
+                               backref=db.backref("entry"))
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "< Entry id: %d  Person id: %d  Entrance id: %d   Building id: %d   At: %s   >" % (self.id,
+                                                                                                  self.person_id,
+                                                                                                  self.entrance_id,
+                                                                                                  self.building_id,
+                                                                                                  self.datentime)
 
 
 ##############################################################################
