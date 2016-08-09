@@ -17,7 +17,7 @@ class Entrance(db.Model):
 
     __tablename__ = "entrances"
 
-    entrance_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    entrance_id = db.Column(db.Integer, primary_key=True)
     entrance_name = db.Column(db.String(20), nullable=False)
     building_id = db.Column(db.Integer, db.ForeignKey('buildings.building_id'), nullable=False)
 
@@ -49,7 +49,7 @@ class Personnel(db.Model):
 
     __tablename__ = "personnels"
 
-    person_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    person_id = db.Column(db.Integer, primary_key=True)
     person_name = db.Column(db.String(50), nullable=False)
     keycode = db.Column(db.Integer, nullable=False)
     manager = db.Column(db.Boolean, nullable=False)
@@ -57,7 +57,7 @@ class Personnel(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "< Person id: %d  Person name: %s   Keycode: %d  Manager: %s  >" % (self.person_id,
+        return "< Person id: %d  Person name: %s   Keycode: %d  Manager: %s >" % (self.person_id,
                                                                                    self.person_name,
                                                                                    self.keycode,
                                                                                    self.manager)
