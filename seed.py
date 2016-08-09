@@ -9,7 +9,7 @@ def load_entrance():
 
     print "Entrance"
 
-    for i, row in enumerate(open("seed_data/entryway")):
+    for i, row in enumerate(open("seed_data/entryway.csv")):
         row = row.rstrip()
         entrance_id, entrance_name, building_id = row.split(",")
 
@@ -33,7 +33,7 @@ def load_building():
 
     print "Buildings"
 
-    for i, row in enumerate(open("seed_data/building")):
+    for i, row in enumerate(open("seed_data/building.csv")):
         row = row.rstrip()
         building_id, building_name, building_address = row.split(",")
 
@@ -57,7 +57,7 @@ def load_personnel():
 
     print "Personnel"
 
-    for i, row in enumerate(open("seed_data/people")):
+    for i, row in enumerate(open("seed_data/people.csv")):
         row = row.rstrip()
         person_id, person_name, keycode, manager = row.split(",")
 
@@ -84,13 +84,14 @@ def load_entries():
 
     print "Entries"
 
-    for i, row in enumerate(open("seed_data/entries")):
+    for i, row in enumerate(open("seed_data/entries.csv")):
         row = row.rstrip()
-        id, person_id, entrance_id, datentime = row.split(",")
+        id, person_id, entrance_id, building_id, datentime = row.split(",")
 
         entry = Entries(id=id,
                         person_id=person_id,
                         entrance_id=entrance_id,
+                        building_id=building_id,
                         datentime=datentime)
 
         #adding to the session
@@ -107,3 +108,8 @@ def load_entries():
 if __name__ == "__main__":
     connect_to_db(app)
     db.create_all()
+
+    load_building()
+    load_personnel()
+    load_entrance()    
+    load_entries()

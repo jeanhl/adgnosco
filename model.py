@@ -17,7 +17,7 @@ class Entrance(db.Model):
 
     __tablename__ = "entrances"
 
-    entrance_id = db.Column(db.Integer, primary_key=True)
+    entrance_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     entrance_name = db.Column(db.String(20), nullable=False)
     building_id = db.Column(db.Integer, db.ForeignKey('buildings.building_id'), nullable=False)
 
