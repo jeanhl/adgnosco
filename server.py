@@ -2,7 +2,7 @@
 
 import arrow
 from jinja2 import StrictUndefined
-from flask import Flask, render_template, request, flash, redirect, session
+from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy import func
 from model import Entrance, Building, Personnel, Entries, connect_to_db, db
@@ -34,7 +34,6 @@ def login_process():
 
     # checking to see if user is in database
     user = Personnel.query.filter_by(person_id=username).first()
-    print user
 
     # problems with user not being in database
     if not user:
@@ -109,19 +108,14 @@ def set_val_entry_id():
     # Get the Max user_id in the database
     result = db.session.query(func.max(Entries.id)).one()
     max_id = int(result[0])
-    print result
+
     return max_id
-    # Set the value for the next entries_id to be max_id + 1
-    # query = "SELECT setval('entries_id_seq', :new_id)"
-    # db.session.execute(query, {'new_id': max_id + 1})
-    # db.session.commit()
+
 
 @app.route('/keyless', methods=['POST'])
 def keyless_entry():
     """Processes the keyless entry."""
     person_id = session['user_id']
-    print person_id
-    
     user = Personnel.query.filter_by(person_id=person_id).first()
 
     # gets the info from the keyless entry
@@ -181,11 +175,71 @@ def show_entries():
             # Building
             # Entryway
 
-    # Reach: do a visual representation of the entries
+    # THE VISUALIZATIONS ROUTES ARE BELOW
 
     return render_template('entries.html')
 
+@app.route('/monthly.json')
+def monthly_logs_data():
+    """Return data about entries on a monthly basis"""
+    # You will want to make this a get request in the future
+    person_id = session['user_id']
+    print person_id
 
+    entries = Entries.query.filter_by(person_id=person_id).all()
+
+    
+
+    monthly_dict = {
+        'datasets': [
+            {
+                'label': 'Cafeteria',
+                'data': [
+                    {
+                        'x': 801,
+                        'y': 2,
+                        'r': 1
+                    },
+                    {
+                        'x': 801,
+                        'y': 1,
+                        'r': 2
+                    }
+                ],
+                'backgroundColor': "#FF6384",
+                'hoverBackgoundColor': "#FF6380",
+            }]
+    }
+    return jsonify(monthly_dict)
+
+
+@app.route('/melon-types.json')
+def melon_types_data():
+    """Return data about Melon Sales."""
+
+    data_list_of_dicts = {
+        'melons': [
+            {
+                "value": 300,
+                "color": "#F7464A",
+                "highlight": "#FF5A5E",
+                "label": "Christmas Melon"
+            },
+            {
+                "value": 50,
+                "color": "#46BFBD",
+                "highlight": "#5AD3D1",
+                "label": "Crenshaw"
+            },
+            {
+                "value": 100,
+                "color": "#FDB45C",
+                "highlight": "#FFC870",
+                "label": "Yellow Watermelon"
+            }
+        ]
+    }
+    return jsonify(data_list_of_dicts)
 
 
     # new_user = User(email=email, password=password, age=age, zipcode=zipcode)
