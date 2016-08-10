@@ -29,15 +29,16 @@ def login_process():
     """Process login."""
 
     # Get form variables
-    username = request.form['username']
-    password = request.form['password']
+    username = request.form.get("username")
+    password = request.form.get("password")
 
     user = Personnel.query.filter_by(person_id=username).first()
+    print user
 
     if not user:
         flash("No such ID registered.")
         return redirect('/')
-
+    password = int(password)
     if user.keycode != password:
         flash("Password does not match password on record.")
         return redirect('/')
