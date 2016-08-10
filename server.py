@@ -32,9 +32,11 @@ def login_process():
     username = request.form.get("username")
     password = request.form.get("password")
 
+    # checking to see if user is in database
     user = Personnel.query.filter_by(person_id=username).first()
     print user
 
+    # problems with user not being in database
     if not user:
         flash("No such ID registered.")
         return redirect('/')
@@ -43,6 +45,7 @@ def login_process():
         flash("Password does not match password on record.")
         return redirect('/')
 
+    # user is in database. Log them in and add them to the session
     session["user_id"] = user.person_id
 
     flash("Logged in successfully")
@@ -53,17 +56,22 @@ def login_process():
 def profile_page():
     """Shows user profile page."""
 
-    # Have the details of the user.
+    # only shows the profile of whoever is in the session
+    person_id = session['user_id']
+    user = Personnel.query.filter_by(person_id=person_id).first()
+
+
+    # Have the details of the user. DONE
     # Have a button to go:
-        # remote access to a door
-        # view their entry logs
+        # remote access to a door DONE
+        # view their entry logs DONE MAYBE
     # Manager:
-        # Be able to view logs
-        # Be able to register a user
+        # Be able to view logs DONE MAYBE
+        # Be able to register a user DONE
         # Reach: Be able to change key code of a user
         # Reach: Be able to deactivate a user
 
-    return render_template('profilepage.html')
+    return render_template('profilepage.html', user=user)
 
 
 @app.route('/register', methods=['POST'])
@@ -73,7 +81,19 @@ def register_process():
     # gets the information from the register form
     # adds the information to the database with checks
 
-    # need to find out how to pass in the userid into the route
+    person_id = request.form['username']
+    person_name = request.form['name']
+    keycode = request.form['password']
+    manager = request.form['manager']
+
+    new_user = Personnel(person_id=person_id,
+                         person_name=person_name,
+                         keycode=keycode,
+                         manager=manager)
+
+    db.session.add(new_user)
+    db.session.commit()
+
     return redirect('/profilepage')
 
 
@@ -88,11 +108,13 @@ def show_keyless_entry():
 def keyless_entry():
     """Processes the keyless entry."""
     person_id = session['user_id']
+    print person_id
     user = Personnel.query.filter_by(person_id=person_id).first()
 
     # gets the info from the keyless entry
     entrance_id = request.form['doorid']
     password = request.form['password']
+    password = int(password)
 
     entrance = Entrance.query.filter_by(entrance_id=entrance_id).first()
 
@@ -103,7 +125,7 @@ def keyless_entry():
 
     # checking keycode for the user logged in
     if user.keycode != password:
-        flash("Password does not match password on record.")
+        flash("Keycode doesn't match.")
         return redirect('/')
 
     building_id = entrance.building_id

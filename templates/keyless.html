@@ -2,7 +2,7 @@
 {% block content %}
 
 <form action='/keyless' method='POST'>
-    Door ID: <input type="text" name:"doorid"><br>
-    Keycode: <input type="password" name:"password"><br>
-    <input type="submit" value:"Unlock">
+    Door ID: <input type="number" name="doorid"><br>
+    Keycode: <input type="password" name="password"><br>
+    <input type="submit" value="Unlock">
 {% endblock %}
