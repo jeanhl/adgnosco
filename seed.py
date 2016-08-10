@@ -2,6 +2,7 @@
 
 from model import Entrance, Building, Personnel, Entries, connect_to_db, db
 from server import app
+from sqlalchemy import func
 
 
 def load_entrance():
@@ -105,6 +106,19 @@ def load_entries():
     db.session.commit()
 
 
+def set_val_entry_id():
+    """Set value for the next entry id after seeding database"""
+
+    # Get the Max user_id in the database
+    result = db.session.query(func.max(Entries.id)).one()
+    max_id = int(result[0])
+
+    # Set the value for the next entries_id to be max_id + 1
+    query = "SELECT setval('entries_id_seq', :new_id)"
+    db.session.execute(query, {'new_id': max_id + 1})
+    db.session.commit()
+
+
 if __name__ == "__main__":
     connect_to_db(app)
     db.create_all()
@@ -113,3 +127,4 @@ if __name__ == "__main__":
     load_personnel()
     load_entrance()    
     load_entries()
+    set_val_entry_id()

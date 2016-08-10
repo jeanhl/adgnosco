@@ -4,7 +4,7 @@ import arrow
 from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
-
+from sqlalchemy import func
 from model import Entrance, Building, Personnel, Entries, connect_to_db, db
 
 app = Flask(__name__)
@@ -103,12 +103,25 @@ def show_keyless_entry():
 
     return render_template('keyless.html')
 
+def set_val_entry_id():
+    """Set value for the next entry id after seeding database"""
+
+    # Get the Max user_id in the database
+    result = db.session.query(func.max(Entries.id)).one()
+    max_id = int(result[0])
+    print result
+    return max_id
+    # Set the value for the next entries_id to be max_id + 1
+    # query = "SELECT setval('entries_id_seq', :new_id)"
+    # db.session.execute(query, {'new_id': max_id + 1})
+    # db.session.commit()
 
 @app.route('/keyless', methods=['POST'])
 def keyless_entry():
     """Processes the keyless entry."""
     person_id = session['user_id']
     print person_id
+    
     user = Personnel.query.filter_by(person_id=person_id).first()
 
     # gets the info from the keyless entry
@@ -133,6 +146,10 @@ def keyless_entry():
     timenow = arrow.utcnow().to('US/Pacific')
     timestring = timenow.isoformat()
 
+    max_id = set_val_entry_id()
+    query = "SELECT setval('entries_id_seq', :new_id)"
+    db.session.execute(query, {'new_id': max_id})
+    db.session.commit()
     # entring new entry into the database
     new_entry = Entries(entrance_id=entrance_id,
                         person_id=person_id,
@@ -152,7 +169,10 @@ def keyless_entry():
 @app.route('/entries')
 def show_entries():
     """Shows the entries of the user selected"""
+    person_id = session['user_id']
+    print person_id
 
+    entries = Entries.query.filter_by(person_id=person_id).all()
     # Default:
         # shows the entries for the month
     # Manager:
