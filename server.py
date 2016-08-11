@@ -1,6 +1,6 @@
 """Adgnosco Server"""
 
-import arrow
+from datetime import datetime
 from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
@@ -137,8 +137,7 @@ def keyless_entry():
 
     building_id = entrance.building_id
 
-    timenow = arrow.utcnow().to('US/Pacific')
-    timestring = timenow.isoformat()
+    datetime_now = arrow.now('US/Pacific')
 
     max_id = set_val_entry_id()
     query = "SELECT setval('entries_id_seq', :new_id)"
@@ -148,7 +147,7 @@ def keyless_entry():
     new_entry = Entries(entrance_id=entrance_id,
                         person_id=person_id,
                         building_id=building_id,
-                        datentime=timestring)
+                        datentime=datetime_now)
 
     # adding to database
     db.session.add(new_entry)
@@ -167,79 +166,68 @@ def show_entries():
     print person_id
 
     entries = Entries.query.filter_by(person_id=person_id).all()
-    # Default:
-        # shows the entries for the month
-    # Manager:
-        # Ability to filter by
-            # Person
-            # Building
-            # Entryway
 
-    # THE VISUALIZATIONS ROUTES ARE BELOW
 
-    return render_template('entries.html')
+    return render_template('entries.html', entries=entries)
+
 
 @app.route('/monthly.json')
 def monthly_logs_data():
     """Return data about entries on a monthly basis"""
     # You will want to make this a get request in the future
-    person_id = session['user_id']
-    print person_id
+    # person_id = session['user_id']
+    # print person_id
 
-    entries = Entries.query.filter_by(person_id=person_id).all()
+    # monthly_dict = {}
+    # datasets_value = []
+    # data_value = []
 
-    
+    # entries = Entries.query.all()
+    # set_of_dates = set()
+    # for entry in entries:
+    #     datentime = arrow.get(entry.datentime)
+    #     date = datentime.day
+    #     set_of_dates.add(date)    
+    #     list_of_dates = list(set_of_dates)
 
-    monthly_dict = {
-        'datasets': [
-            {
-                'label': 'Cafeteria',
-                'data': [
-                    {
-                        'x': 801,
-                        'y': 2,
-                        'r': 1
-                    },
-                    {
-                        'x': 801,
-                        'y': 1,
-                        'r': 2
-                    }
-                ],
-                'backgroundColor': "#FF6384",
-                'hoverBackgoundColor': "#FF6380",
-            }]
-    }
+    #     y_value = 
+    #     r_value = len(Entries.query.filter_by(all()
+
+    # make 
+
+
+    # monthly_dict = {
+    #     'datasets': [
+    #         {
+    #             'label': 'Cafeteria', (BUILDING NAME)
+    #             'data': [
+    #                 {
+    #                     'x': 801 (DATE)
+    #                     'y': 2 (RANGE OF TIME)
+    #                     'r': (SUM OF PEOPLE *10)
+    #                 },
+    #                 {
+    #                     'x': 801,
+    #                     'y': 1,
+    #                     'r': 2
+    #                 }
+    #             ],
+    #             'backgroundColor': "#FF6384",
+    #             'hoverBackgoundColor': "#FF6380",
+    #         }]
+    # }
     return jsonify(monthly_dict)
 
 
-@app.route('/melon-types.json')
-def melon_types_data():
-    """Return data about Melon Sales."""
 
-    data_list_of_dicts = {
-        'melons': [
-            {
-                "value": 300,
-                "color": "#F7464A",
-                "highlight": "#FF5A5E",
-                "label": "Christmas Melon"
-            },
-            {
-                "value": 50,
-                "color": "#46BFBD",
-                "highlight": "#5AD3D1",
-                "label": "Crenshaw"
-            },
-            {
-                "value": 100,
-                "color": "#FDB45C",
-                "highlight": "#FFC870",
-                "label": "Yellow Watermelon"
-            }
-        ]
-    }
-    return jsonify(data_list_of_dicts)
+
+
+
+
+
+
+
+
 
 
     # new_user = User(email=email, password=password, age=age, zipcode=zipcode)

@@ -70,7 +70,7 @@ class Entries(db.Model):
     person_id = db.Column(db.Integer, db.ForeignKey('personnels.person_id'), nullable=False)
     entrance_id = db.Column(db.Integer, db.ForeignKey('entrances.entrance_id'), nullable=False)
     building_id = db.Column(db.Integer, db.ForeignKey('buildings.building_id'), nullable=False)
-    datentime = db.Column(db.String(200), nullable=False)
+    datentime = db.Column(db.DateTime, nullable=False)
 
     # Defining relationships to person, entrance, building
     person = db.relationship("Personnel",

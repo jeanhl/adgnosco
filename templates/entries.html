@@ -3,73 +3,24 @@
 
     <p> Pull from database to display the entries </p>
 
-    <div class='monthly-chart'>
-        <canvas id='bubbleChart'></canvas>
-        <div id='bubbleLegend' class='chart-legend'></div>
-    </div>
+    for building in buildings 
+
+        for e in building.entries
+
+           for time_slot in my_list_of_time_slots
+
+              for entry in my_list_of_time_slots[time_slot]
 
 
-    <div class="melon-chart">
-    <canvas id="donutChart"></canvas>
-    <div id="donutLegend" class="chart-legend"></div>
-    </div>
+    {% for entry in entries %}
 
-    <script>
-        // var options = {
-        // responsive: true
-        // };
+    Date and time: {{ entry.datentime[:10] }} <br>
+    Number of people: {{ entries|sum(entry.building_id) }}
 
 
-        var ctx_bubble = $("#bubbleChart").get(0).getContext("2d");
-
-        $.get("/monthly.json", function (data) { 
-            console.log(data)
-            console.log(ctx_bubble)
-        var myBubbleChart = new Chart(ctx_bubble,{
-        type: 'bubble',
-        data: data,
-        options: {
-        responsive: true
-        }        });
-        $('#bubbleLegend').html(myBubbleChart.generateLegend());
-        });
-       
-
-        
-
-        // var data = {
-        // datasets: [
-        // {
-        //     label: 'First Dataset',
-        //     data: [
-        //         {
-        //             x: 20,
-        //             y: 30,
-        //             r: 15
-        //         },
-        //         {
-        //             x: 40,
-        //             y: 10,
-        //             r: 10
-        //         }
-        //     ],
-        //     backgroundColor:"#FF6384",
-        //     hoverBackgroundColor: "#FF6384",
-        // }]
-        // };
-
-        
+    {% endfor %}
 
 
-        // $('#bubbleLegend').html(myBubbleChart.generateLegend());
-        // Make Donut Chart of percent of different types of Melons
-        // var ctx_donut = $("#donutChart").get(0).getContext("2d");
 
-        // $.get("/melon-types.json", function (data) {
-        //   var myDonutChart = new Chart(ctx_donut).Doughnut(data.melons, options);
-        //   $('#donutLegend').html(myDonutChart.generateLegend());
-        // });
-
-    </script>
 
 {% endblock %}
