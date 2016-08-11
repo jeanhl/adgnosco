@@ -1,6 +1,6 @@
 """Adgnosco Server"""
 
-from datetime import datetime
+import arrow
 from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
@@ -137,7 +137,8 @@ def keyless_entry():
 
     building_id = entrance.building_id
 
-    datetime_now = arrow.now('US/Pacific')
+    datetime_now = arrow.now('US/Pacific').datetime
+    print arrow.now('US/Pacific').datetime
 
     max_id = set_val_entry_id()
     query = "SELECT setval('entries_id_seq', :new_id)"
@@ -175,25 +176,40 @@ def show_entries():
 def monthly_logs_data():
     """Return data about entries on a monthly basis"""
     # You will want to make this a get request in the future
-    # person_id = session['user_id']
-    # print person_id
+    person_id = session['user_id']
+    print person_id
 
-    # monthly_dict = {}
-    # datasets_value = []
-    # data_value = []
+    entries = Entries.query.all()
+    buildings = Building.query.all()
 
-    # entries = Entries.query.all()
-    # set_of_dates = set()
-    # for entry in entries:
-    #     datentime = arrow.get(entry.datentime)
-    #     date = datentime.day
-    #     set_of_dates.add(date)    
-    #     list_of_dates = list(set_of_dates)
+    print "******* ENTRIES *********"
+    print entries
+    print "******* BUILDING *********"
+    print buildings
 
-    #     y_value = 
-    #     r_value = len(Entries.query.filter_by(all()
+    # largest structure, the value is a list of dictionaries
+    monthly_dict = {'datasets': [] }
 
-    # make 
+    # middle structure, making the large list of dictionaries
+    for building in buildings:
+        building_name = building.building_name
+        med_dict = {'label': building_name } 
+        med_dict['data'] = []
+        med_dict['backgroundColor'] = "#FF6384"
+        med_dict['hoverBackgoundColor'] = "#FF6380"
+        monthly_dict['datasets'].append( med_dict )
+        print monthly_dict
+
+
+        # smallest structure, making the list of mini dictionaries
+        for entry in entries:
+            x_value = entry.datentime.date().day
+            y_value = entry.datentime.time().hour
+            r_value = 40
+            mini_dict = { 'x' : x_value, 'y' : y_value, 'r' : r_value}
+            med_dict['data'].append(mini_dict)
+            print med_dict
+
 
 
     # monthly_dict = {
@@ -202,12 +218,12 @@ def monthly_logs_data():
     #             'label': 'Cafeteria', (BUILDING NAME)
     #             'data': [
     #                 {
-    #                     'x': 801 (DATE)
-    #                     'y': 2 (RANGE OF TIME)
+    #                     'x': 1 (DATE)
+    #                     'y': 2 (HOUR)
     #                     'r': (SUM OF PEOPLE *10)
     #                 },
     #                 {
-    #                     'x': 801,
+    #                     'x': 2,
     #                     'y': 1,
     #                     'r': 2
     #                 }
@@ -216,6 +232,7 @@ def monthly_logs_data():
     #             'hoverBackgoundColor': "#FF6380",
     #         }]
     # }
+    print monthly_dict
     return jsonify(monthly_dict)
 
 

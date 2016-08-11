@@ -3,19 +3,6 @@
 
     <p> Pull from database to display the entries </p>
 
-    for building in buildings 
-
-        for e in building.entries
-
-           for time_slot in my_list_of_time_slots
-
-              for entry in my_list_of_time_slots[time_slot]
-
-
-    {% for entry in entries %}
-
-    Date and time: {{ entry.datentime[:10] }} <br>
-    Number of people: {{ entries|sum(entry.building_id) }}
 
 
     {% endfor %}
