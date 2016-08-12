@@ -4,10 +4,43 @@
     <p> Pull from database to display the entries </p>
 
 
+    <div class='monthly-chart' width="200">
+        <canvas id='bubbleChart'></canvas>
+        <div id='bubbleLegend' class='chart-legend'></div>
+    </div>
 
-    {% endfor %}
 
 
+    <script>
+        Chart.scaleService.updateScaleDefaults('linear', {
+        ticks: {
+            stepSize: 1
+        }})
+        var ctx_bubble = $("#bubbleChart").get(0).getContext("2d");
+
+        var my_options = {
+            reposive:true,
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        max: 31,
+                        min: 0,  } }],
+                yAxes: [{
+                    ticks: {
+                        min: 0  } }]
+            }   
+        }
+
+        $.get("/monthly.json", function (data) { 
+            console.log(data)
+            console.log(ctx_bubble)
+        var myBubbleChart = new Chart(ctx_bubble,{
+        type: 'bubble',
+        data: data,
+        options: my_options        
+        });
+        });
+    </script>
 
 
 {% endblock %}
