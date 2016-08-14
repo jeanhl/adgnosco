@@ -1,14 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
 
-    <p> Pull from database to display the entries </p>
+    <p> Pull from database to display two charts: By month, by building.</p>
 
 
-    <div class='monthly-chart' width="200">
-        <canvas id='bubbleChart'></canvas>
-        <div id='bubbleLegend' class='chart-legend'></div>
+    <div class='monthly-chart'>
+        <canvas id='bubbleChartMonth' width='100px' height='100px'></canvas>
     </div>
 
+    <div class='monthly-chart'>
+        <canvas id='bubbleChartBuilding' width='100px' height='100px'></canvas>
+    </div>
 
 
     <script>
@@ -16,8 +18,7 @@
         ticks: {
             stepSize: 1
         }})
-        var ctx_bubble = $("#bubbleChart").get(0).getContext("2d");
-
+        
         var my_options = {
             reposive:true,
             scales: {
@@ -31,10 +32,21 @@
             }   
         }
 
+        var ctx_bubble_M = $("#bubbleChartMonth").get(0).getContext("2d");
+
         $.get("/monthly.json", function (data) { 
-            console.log(data)
-            console.log(ctx_bubble)
-        var myBubbleChart = new Chart(ctx_bubble,{
+        var myBubbleChart = new Chart(ctx_bubble_M,{
+        type: 'bubble',
+        data: data,
+        options: my_options        
+        });
+        });
+
+
+        var ctx_bubble_B = $("#bubbleChartBuilding").get(0).getContext("2d");
+
+        $.get("/building.json", function (data) { 
+        var myBubbleChart = new Chart(ctx_bubble_B,{
         type: 'bubble',
         data: data,
         options: my_options        
