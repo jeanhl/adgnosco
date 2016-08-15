@@ -1,6 +1,8 @@
 """Adgnosco Server"""
 
 import arrow
+import datetime
+import calendar
 from collections import defaultdict
 from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
@@ -240,7 +242,12 @@ def building_logs_data():
     # pass in the month so that you'll get the report for THAT month
     person_id = session['user_id']
 
+    year = 2016
     month = 8
+    #number of days in a month
+    num_days = calendar.monthrange(year, month)[1]
+    start_date = datetime.date(year, month, 1)
+    end_date = datetime.date(year, month, num_days)
     building_id = 1
     ##### month = request.args.get('month')
 
@@ -254,18 +261,22 @@ def building_logs_data():
     # hirarchy: dict_of_entries > entrace_dict > byday_dict > byhour_dict
 
     # filtering all entries by the month and building specified
-    entriesbybuilding = (Entries.query.filter(Entries.building_id==building_id).all())
-    for entrybybuilding in entriesbybuilding:
-        if entrybybuilding.datentime.date().month==month:
-            for eachday in range(31):
-                if entrybybuilding.datentime.date().day == eachday:
-                    # making a dictionary with count of entries
-                    hourly = entrybybuilding.datentime.time().hour
-                    byhour_dict[hourly] += 1
-                byday_dict[entrybybuilding.datentime.date().day] = byhour_dict
-            dict_of_entries[entrybybuilding.entrance_id] = byday_dict
 
+    entriesbybuilding = (Entries.query.filter(Entries.building_id==building_id, 
+                                              Entries.datentime >= start_date,
+                                              Entries.datentime <= end_date).all())
+    print "ENTRIES BY BUILDING"
+    print entriesbybuilding
+    for entrybybuilding in entriesbybuilding:
+        # making a dictionary with count of entries
+        hourly = entrybybuilding.datentime.time().hour
+        byhour_dict[hourly] += 1
+        byday_dict[entrybybuilding.datentime.date().day] = byhour_dict
+        dict_of_entries[entrybybuilding.entrance_id] = byday_dict
+
+    print "~~~~~~~~~~~~~~~~~~~~~"
     print dict_of_entries
+    print "~~~~~~~~~~~~~~~~~~~~~"
 
     list_color = ['#0001ff', '#59fa67', '#fff138',
                   '#e62600', '#dd3cc4', '#b7cb34',
@@ -285,22 +296,34 @@ def building_logs_data():
     # middle structure, making the large list of dictionaries
     count = 0
     for entry2 in entriesbybuilding:
-        entranceid = entry2.id
+        print "FOR LOOP ENTERING entry2"
+        print entry2
+        entranceid = entry2.entrance_id
+        print "entranceid!!!~~~~"
+        print entranceid
         med_dict = {'label': entranceid}
         med_dict['data']=[]
         med_dict['backgroundColor'] = list_color[count]
         med_dict['hoverBackgoundColor'] = list_color[count]
         building_dict['datasets'].append( med_dict )
         count += 1
+        print "COUNTING THROUGH THE FOR LOOP"
+        print count
 
         # smallest structure, making the list of mini dictionaries
         building = Building.query.filter(Building.building_name == "Main").first()
         if entry2.building_id == building.building_id:
+            print "EACH DOOR NOW"
+            print entry2.building_id
             x_value = entry2.datentime.date().day
             y_value = entry2.datentime.time().hour
             # getting the r_value from the dict_of_entries above
-            dailylog = dict_of_entries.get(entranceid)
+            print "entranceid!!!~~~~"
+            print entranceid
+            dailylog = dict_of_entries.get(entranceid, {}) #FIXIT, returning none
+            print ".........................."
             print dailylog
+            print ".........................."
             hourlylog = dailylog.get(x_value)
             r_value = hourlylog.get(y_value)
             # back to making the mini dictionary
