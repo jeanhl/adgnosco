@@ -249,6 +249,7 @@ def building_logs_data():
     start_date = datetime.date(year, month, 1)
     end_date = datetime.date(year, month, num_days)
     building_id = 1
+    door_choosen = 1
     ##### month = request.args.get('month')
 
     # making nested dictionaries of the entries by door by day for the month specified
@@ -257,27 +258,34 @@ def building_logs_data():
     #                   }
     dict_of_entries = {}
     byday_dict = {}
-    byhour_dict = defaultdict(int)
+    
+    
     # hirarchy: dict_of_entries > entrace_dict > byday_dict > byhour_dict
 
     # filtering all entries by the month and building specified
 
-    entriesbybuilding = (Entries.query.filter(Entries.building_id==building_id, 
+    entriesbybuilding = (Entries.query.filter(Entries.building_id==building_id,
+                                              Entries.entrance_id==door_choosen, 
                                               Entries.datentime >= start_date,
                                               Entries.datentime <= end_date).all())
-    print "ENTRIES BY BUILDING"
-    print entriesbybuilding
-    for entrybybuilding in entriesbybuilding:
-        # making a dictionary with count of entries
-        hourly = entrybybuilding.datentime.time().hour
-        byhour_dict[hourly] += 1
-        byday_dict[entrybybuilding.datentime.date().day] = byhour_dict
-        dict_of_entries[entrybybuilding.entrance_id] = byday_dict
 
-    print "~~~~~~~~~~~~~~~~~~~~~"
+    doorsinbuilding = Entrance.query.filter_by(building_id=building_id).all()
+    print "DOORS IN BUILDING"
+    print len(doorsinbuilding)
+
+    for i in range(num_days):
+        byhour_dict = defaultdict(int)
+        for entrybybuilding in entriesbybuilding:
+            if entrybybuilding.datentime.date().day == i:
+    # making a dictionary with count of entries
+                hourly = entrybybuilding.datentime.time().hour
+                byhour_dict[hourly] += 1
+                print "HOURLY COUNT"
+                print byhour_dict
+                byday_dict[entrybybuilding.datentime.date().day] = byhour_dict
+            dict_of_entries[entrybybuilding.entrance_id] = byday_dict
     print dict_of_entries
-    print "~~~~~~~~~~~~~~~~~~~~~"
-
+    
     list_color = ['#0001ff', '#59fa67', '#fff138',
                   '#e62600', '#dd3cc4', '#b7cb34',
                   '#0001ff', '#59fa67', '#fff138',
@@ -291,45 +299,43 @@ def building_logs_data():
     # largest structure, the value is a list of dictionaries
     building_dict = {'datasets': []}
 
-    entries = Entries.query.all()
-
     # middle structure, making the large list of dictionaries
     count = 0
-    for entry2 in entriesbybuilding:
-        print "FOR LOOP ENTERING entry2"
-        print entry2
-        entranceid = entry2.entrance_id
-        print "entranceid!!!~~~~"
-        print entranceid
-        med_dict = {'label': entranceid}
-        med_dict['data']=[]
+    for door_id, door_info in dict_of_entries.items():
+        #entranceid = entry2.entrance_id
+        med_dict = {'label': 'Door id: %d' %(door_choosen)}
         med_dict['backgroundColor'] = list_color[count]
         med_dict['hoverBackgoundColor'] = list_color[count]
+        data = []
+
+        #build data
+        for day, hours in door_info.items():
+            x_value = day
+            for hour, people in hours.items():
+                y_value = hour
+                r_value = people
+                mini_dict = { 'x':x_value, 'y':y_value, 'r':r_value}
+                data.append(mini_dict)
+
+        med_dict['data'] = data
         building_dict['datasets'].append( med_dict )
         count += 1
-        print "COUNTING THROUGH THE FOR LOOP"
-        print count
-
+       
         # smallest structure, making the list of mini dictionaries
-        building = Building.query.filter(Building.building_name == "Main").first()
-        if entry2.building_id == building.building_id:
-            print "EACH DOOR NOW"
-            print entry2.building_id
-            x_value = entry2.datentime.date().day
-            y_value = entry2.datentime.time().hour
-            # getting the r_value from the dict_of_entries above
-            print "entranceid!!!~~~~"
-            print entranceid
-            dailylog = dict_of_entries.get(entranceid, {}) #FIXIT, returning none
-            print ".........................."
-            print dailylog
-            print ".........................."
-            hourlylog = dailylog.get(x_value)
-            r_value = hourlylog.get(y_value)
-            # back to making the mini dictionary
-            mini_dict = {'x':x_value, 'y':y_value, 'r':r_value}
-            med_dict['data'].append(mini_dict)
+        # for door_id, day_of_month in dict_of_entries.items():
+        #     for hours in day_of_month:
+        #         x_value = day_of_month taken from dictionary
+        #         y_value = hour taken from dictionary
+        #         # getting the r_value from the dict_of_entries above
+        #         dailylog = dict_of_entries.get(key)
+        #         hourlylog = dailylog.get(x_value)
+        #         r_value = hourlylog.get(y_value)
+        #         # back to making the mini dictionary
+        #         mini_dict = {'x':x_value, 'y':y_value, 'r':r_value}
+        #         med_dict['data'].append(mini_dict)
     
+    print building_dict
+    # return jsonify({"datasets": datasets})
     return jsonify(building_dict)
 
 

@@ -62,7 +62,7 @@ class Personnel(db.Model):
                                                                                    self.keycode,
                                                                                    self.manager)
 class Entries(db.Model):
-    """ People who have access to the building. """
+    """ Individual entries into a building via an entryway. """
 
     __tablename__ = "entries"
 
