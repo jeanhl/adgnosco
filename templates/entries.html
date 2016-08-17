@@ -1,18 +1,52 @@
+
+
 {% extends 'base.html' %}
 {% block content %}
+<body>
+    <!-- This div is all about the monthly chart. Getting a specific month and displaying it -->
+    <div id='byMonthChart'>
+        <form action='/monthly.json' method='get'>
+            Select the month which you'd like to view the log (logs are viewable for the next 6 months):
+            <select name="month">
+              {% for month in available_months %}
+              <option value={{ month }}> {{month}} </option>
+              {% endfor %}
+            </select>
+            <input type='submit'>
+        </form>
 
-    <p> Pull from database to display two charts: By month, by building.</p>
 
-
-    <div class='monthly-chart'>
-        <canvas id='bubbleChartMonth' width="100" height="100"></canvas>
+        <div class='monthly-chart'>
+            <canvas id='bubbleChartMonth'></canvas>
+        </div>
     </div>
 
-    <div class='monthly-chart'>
-        <canvas id='bubbleChartBuilding' width='100px' height='100px'></canvas>
+    <!-- This div is all about the building chart. Getting a specific month, building and door and displaying it -->
+    <div id='byBuildingChart'>
+        <form action='/building.json' method='get'>
+            Select the month, building and door id which you'd like to view the log (logs are viewable for the next 6 months). <br>
+            Select month:
+            <select name="month">
+              {% for month in available_months %}
+              <option value={{ month }}> {{month}} </option>
+              {% endfor %}
+            </select>
+            Select building:
+            <select name="building">
+              {% for building in available_buildings %}
+              <option value={{ building }}> {{building}} </option>
+              {% endfor %}
+            </select>
+            <input type='submit'>
+        </form>
+        <div id='byBuildingChart'>
+            <div class='monthly-chart'>
+                <canvas id='bubbleChartBuilding'></canvas>
+            </div>
+        </div>
     </div>
 
-
+    <!-- This the JS script that generates the charts-->
     <script>
         Chart.scaleService.updateScaleDefaults('linear', {
         ticks: {
@@ -21,6 +55,7 @@
         
         var my_options = {
             reposive:true,
+            maintainAspectRatio:true,
             scales: {
                 xAxes: [{
                     ticks: {
@@ -33,6 +68,8 @@
         }
 
         var ctx_bubble_M = $("#bubbleChartMonth").get(0).getContext("2d");
+        ctx_bubble_M.canvas.width = 300;
+        ctx_bubble_M.canvas.height = 300;
 
         $.get("/monthly.json", function (data) { 
         var myBubbleChart = new Chart(ctx_bubble_M,{
