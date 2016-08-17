@@ -5,14 +5,15 @@
 <body>
     <!-- This div is all about the monthly chart. Getting a specific month and displaying it -->
     <div id='byMonthChart'>
-        <form action='/monthly.json' method='get'>
+        <form>
             Select the month which you'd like to view the log (logs are viewable for the next 6 months):
-            <select name="month">
+            <select name="month" id='monthChartmonth'>
+              <option value='none'></option>
               {% for month in available_months %}
               <option value={{ month }}> {{month}} </option>
               {% endfor %}
             </select>
-            <input type='submit'>
+            <input type='submit' id='submitformonthlychart'>
         </form>
 
 
@@ -23,21 +24,23 @@
 
     <!-- This div is all about the building chart. Getting a specific month, building and door and displaying it -->
     <div id='byBuildingChart'>
-        <form action='/building.json' method='get'>
+        <form>
             Select the month, building and door id which you'd like to view the log (logs are viewable for the next 6 months). <br>
             Select month:
             <select name="month">
+              <option value='none'></option>
               {% for month in available_months %}
               <option value={{ month }}> {{month}} </option>
               {% endfor %}
             </select>
             Select building:
             <select name="building">
+              <option value='none'></option>
               {% for building in available_buildings %}
               <option value={{ building }}> {{building}} </option>
               {% endfor %}
             </select>
-            <input type='submit'>
+            <input type='submit' id='submitforbuildingchart'>
         </form>
         <div id='byBuildingChart'>
             <div class='monthly-chart'>
@@ -68,16 +71,22 @@
         }
 
         var ctx_bubble_M = $("#bubbleChartMonth").get(0).getContext("2d");
-        ctx_bubble_M.canvas.width = 300;
-        ctx_bubble_M.canvas.height = 300;
 
-        $.get("/monthly.json", function (data) { 
-        var myBubbleChart = new Chart(ctx_bubble_M,{
-        type: 'bubble',
-        data: data,
-        options: my_options        
-        });
-        });
+        var monthToBepassed = $('#monthChartmonth option:selected').text();
+            console.log(monthToBepassed);
+
+        var buildMonthlyChart = function(evt) {
+            var monthToBepassed = $('#monthChartmonth option:selected').text();
+            console.log(monthToBepassed);
+            evt.preventDefault(); 
+            $.get("/monthly.json", {'month': monthToBepassed}, function (data) {
+                var myBubbleChart = new Chart(ctx_bubble_M,{
+                type: 'bubble',
+                data: data,
+                options: my_options        
+                });
+            });
+        };
 
 
         var ctx_bubble_B = $("#bubbleChartBuilding").get(0).getContext("2d");
@@ -89,6 +98,12 @@
         options: my_options        
         });
         });
+
+        // Event listners that will call the functions to build the charts        
+        $('#submitformonthlychart').click(buildMonthlyChart);
+
+
+
     </script>
 
 

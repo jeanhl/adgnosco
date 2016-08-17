@@ -179,8 +179,6 @@ def show_entries():
     for building in buildings_in_db:
         available_buildings.add(building.building_name)
 
-    
-
 
     return render_template('entries.html', available_months=available_months,
                                            available_buildings=available_buildings)
@@ -195,7 +193,9 @@ def monthly_logs_data():
 
     year = 2016
     month = request.args.get('month')
+    print "Month = ", month
     month = int(month)
+    
 
     num_days = calendar.monthrange(year, month)[1]
     start_date = datetime.date(year, month, 1)
