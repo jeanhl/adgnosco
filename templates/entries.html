@@ -41,6 +41,7 @@
             <input type='submit' id='submitforbuildingchart'>
         </form>
         <div id='door_ids_dynamic'>
+            <p> Testing the area for the new buttons</p>
             <!-- adding in dynamically numbered?amount? buttons here -->
         </div>
         <div id='byBuildingChart'>
@@ -96,6 +97,7 @@
         var ctx_bubble_B = $("#bubbleChartBuilding").get(0).getContext("2d");
 
         var buildBuildingChart = function(evt) {
+            $('.door_btn').remove();
             var secondMonthToBepassed = $('#buildingChartmonth option:selected').text();
             var buildingToBepassed = $('#buildingChartbuilding option:selected').text();
             evt.preventDefault(); 
@@ -109,14 +111,35 @@
                         type: 'bubble',
                         data: charts_list[i],
                         options: my_options 
-                });}}
+                });
+                        // Code for making the buttons for the building charts to toggle which door chart to show
+                        var button_div = document.getElementById('door_ids_dynamic')
+                        var btn = document.createElement("BUTTON");
+                        // getting the label for the buttons
+                        for (var data_key in charts_list) {
+                            console.log(data_key[i])
+                        }
+                        var num_btn = i;
+                        var btn_label = document.createTextNode(num_btn);
+                        btn.appendChild(btn_label);
+                        btn.setAttribute('class', 'door_btn')
+                        btn.setAttribute('id', i)
+                        button_div.appendChild(btn);
+        
+                    }}
             });
         };
         // this is the end of making chart by building by month
+        
 
         // Event listners that will call the functions to build the charts        
         $('#submitformonthlychart').click(buildMonthlyChart);
         $('#submitforbuildingchart').click(buildBuildingChart);
+    
+
+        
+
+
 
 
     </script>
