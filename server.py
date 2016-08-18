@@ -252,6 +252,34 @@ def monthly_logs_data():
 
     return jsonify(monthly_dict)
 
+@app.route('/door.json')
+def door_data():
+    """Returns door options to populate dropdown"""
+    # getting all the variables set 
+    year = 2016
+    month = request.args.get('month')
+    print month
+    month = int(month)
+    #number of days in a month
+    num_days = calendar.monthrange(year, month)[1]
+    start_date = datetime.date(year, month, 1)
+    end_date = datetime.date(year, month, num_days)
+    building_name = request.args.get('building')
+    building_name = building_name.strip()
+    building_choosen = Building.query.filter(Building.building_name == building_name).first()
+    building_id = building_choosen.building_id
+    doors_of_choosen_building = Entrance.query.filter(Entrance.building_id == building_id).all()
+
+    doors_list = []
+
+    for each_door_in_building in doors_of_choosen_building:
+        door_choosen = each_door_in_building.entrance_id
+        doors_list.append(door_choosen)
+
+    print doors_list
+
+    return jsonify({'doors_list':doors_list})
+
 
 @app.route('/building.json')
 def building_logs_data():
@@ -268,80 +296,77 @@ def building_logs_data():
     num_days = calendar.monthrange(year, month)[1]
     start_date = datetime.date(year, month, 1)
     end_date = datetime.date(year, month, num_days)
+
     building_name = request.args.get('building')
     building_name = building_name.strip()
     building_choosen = Building.query.filter(Building.building_name == building_name).first()
     building_id = building_choosen.building_id
-    doors_of_choosen_building = Entrance.query.filter(Entrance.building_id == building_id).all()
+
+    door_choosen = request.args.get('door')
+    door_choosen = int(door_choosen)
 
     # making nested dictionaries of the entries by door by day for the month specified
     # dict_of_doors  = {entrance_id1:{day1:{hour1a:count1b, hour1b:count1b}, day2:{hour2a:count2b, hour2b:count2b}},
     #                   entrance_id2:{day1:{hour1a:count1b, hour1b:count1b}, day2:{hour2a:count2b, hour2b:count2b}}
     #                   }
-    charts_list = []
-    for each_door_in_building in doors_of_choosen_building:
-        door_choosen = each_door_in_building.entrance_id
-        dict_of_entries = {}
-        byday_dict = {}
-               
-        # hirarchy: dict_of_entries > entrace_dict > byday_dict > byhour_dict
-        # filtering all entries by the month and building specified
-        entriesbybuilding = (Entries.query.filter(Entries.building_id==building_id,
-                                                  Entries.entrance_id==door_choosen,
-                                                  Entries.datentime >= start_date,
-                                                  Entries.datentime <= end_date).all())
+    dict_of_entries = {}
+    byday_dict = {}
 
-        # doorsinbuilding = Entrance.query.filter_by(building_id=building_id).all()
+    # hirarchy: dict_of_entries > entrace_dict > byday_dict > byhour_dict
+    # filtering all entries by the month and building specified
+    entriesbybuilding = (Entries.query.filter(Entries.building_id==building_id,
+                                              Entries.entrance_id==door_choosen,
+                                              Entries.datentime >= start_date,
+                                              Entries.datentime <= end_date).all())
 
-        for i in range(num_days):
-            byhour_dict = defaultdict(int)
-            for entrybybuilding in entriesbybuilding:
-                if entrybybuilding.datentime.date().day == i:
-        # making a dictionary with count of entries
-                    hourly = entrybybuilding.datentime.time().hour
-                    byhour_dict[hourly] += 1
-                    byday_dict[entrybybuilding.datentime.date().day] = byhour_dict
-                dict_of_entries[entrybybuilding.entrance_id] = byday_dict
-        
-        list_color = ['#0001ff', '#59fa67', '#fff138',
-                      '#e62600', '#dd3cc4', '#b7cb34',
-                      '#0001ff', '#59fa67', '#fff138',
-                      '#e62600', '#dd3cc4', '#b7cb34',
-                      '#0001ff', '#59fa67', '#fff138',
-                      '#e62600', '#dd3cc4', '#b7cb34',
-                      '#0001ff', '#59fa67', '#fff138',
-                      '#e62600', '#dd3cc4', '#b7cb34',
-                      '#ff6600', '#22dc09', '#af040c']
+    # doorsinbuilding = Entrance.query.filter_by(building_id=building_id).all()
 
-        # largest structure, the value is a list of dictionaries
-        building_dict = {'datasets': []}
+    for i in range(num_days):
+        byhour_dict = defaultdict(int)
+        for entrybybuilding in entriesbybuilding:
+            if entrybybuilding.datentime.date().day == i:
+    # making a dictionary with count of entries
+                hourly = entrybybuilding.datentime.time().hour
+                byhour_dict[hourly] += 1
+                byday_dict[entrybybuilding.datentime.date().day] = byhour_dict
+            dict_of_entries[entrybybuilding.entrance_id] = byday_dict
+    
+    list_color = ['#0001ff', '#59fa67', '#fff138',
+                  '#e62600', '#dd3cc4', '#b7cb34',
+                  '#0001ff', '#59fa67', '#fff138',
+                  '#e62600', '#dd3cc4', '#b7cb34',
+                  '#0001ff', '#59fa67', '#fff138',
+                  '#e62600', '#dd3cc4', '#b7cb34',
+                  '#0001ff', '#59fa67', '#fff138',
+                  '#e62600', '#dd3cc4', '#b7cb34',
+                  '#ff6600', '#22dc09', '#af040c']
 
-        # middle structure, making the large list of dictionaries
-        count = 0
-        for door_id, door_info in dict_of_entries.items():
-            #entranceid = entry2.entrance_id
-            med_dict = {'label': 'Door id: %d' %(door_choosen)}
-            med_dict['backgroundColor'] = list_color[count]
-            med_dict['hoverBackgoundColor'] = list_color[count]
-            data = []
+    # largest structure, the value is a list of dictionaries
+    building_dict = {'datasets': []}
 
-            #build data
-            for day, hours in door_info.items():
-                x_value = day
-                for hour, people in hours.items():
-                    y_value = hour
-                    r_value = people
-                    mini_dict = { 'x':x_value, 'y':y_value, 'r':r_value}
-                    data.append(mini_dict)
+    # middle structure, making the large list of dictionaries
+    count = 0
+    for door_id, door_info in dict_of_entries.items():
+        #entranceid = entry2.entrance_id
+        med_dict = {'label': 'Door id: %d' %(door_choosen)}
+        med_dict['backgroundColor'] = list_color[count]
+        med_dict['hoverBackgoundColor'] = list_color[count]
+        data = []
 
-            med_dict['data'] = data
-            building_dict['datasets'].append( med_dict )
-            count += 1
-        
-        charts_list.append(building_dict)
+        #build data
+        for day, hours in door_info.items():
+            x_value = day
+            for hour, people in hours.items():
+                y_value = hour
+                r_value = people
+                mini_dict = {'x':x_value, 'y':y_value, 'r':r_value}
+                data.append(mini_dict)
 
-    # return jsonify({"datasets": datasets})
-    return jsonify({'charts_list':charts_list})
+        med_dict['data'] = data
+        building_dict['datasets'].append( med_dict )
+        count += 1
+
+    return jsonify(building_dict)
 
 
 if __name__ == "__main__":

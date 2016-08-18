@@ -24,6 +24,7 @@
     <div id='byBuildingChart'>
         <form>
             Select the month, building and door id which you'd like to view the log (logs are viewable for the next 6 months). <br>
+            <!-- getting the month -->
             Select month:
             <select name="month" id='buildingChartmonth'>
               <option value='none'></option>
@@ -31,6 +32,7 @@
               <option value={{ month }}> {{month}} </option>
               {% endfor %}
             </select>
+            <!-- getting the building -->
             Select building:
             <select name="building" id='buildingChartbuilding'>
               <option value='none'></option>
@@ -38,12 +40,14 @@
               <option value={{ building }}> {{building}} </option>
               {% endfor %}
             </select>
+            <!-- getting the door AFTER it is populated by building -->
+            Select door:
+            <select name="door" id='buildingChartdoor'>
+            <option value='none'></option>
+            </select>
+            <!-- submit button for the whole form -->
             <input type='submit' id='submitforbuildingchart'>
         </form>
-        <div id='door_ids_dynamic'>
-            <p> Testing the area for the new buttons</p>
-            <!-- adding in dynamically numbered?amount? buttons here -->
-        </div>
         <div id='byBuildingChart'>
             <div class='monthly-chart'>
                 <canvas id='bubbleChartBuilding'></canvas>
@@ -54,14 +58,12 @@
     <!-- This the JS script that generates the charts-->
     <script>
         // This one deafults the ticks on the charts to 1. 
-        Chart.scaleService.updateScaleDefaults('linear', {
-        ticks: {
-            stepSize: 1
-        }})
+        Chart.scaleService.updateScaleDefaults('linear', 
+        { ticks: { stepSize: 1 } });
         
         // This are the options for the charts
         var my_options = {
-            reposive:true,
+            reponsive:true,
             maintainAspectRatio:true,
             scales: {
                 xAxes: [{
@@ -72,13 +74,13 @@
                     ticks: {
                         min: 0  } }]
             }   
-        }
+        };
         // This is the code needed to build the chart based on the user's 
         // selection of the month
         var ctx_bubble_M = $("#bubbleChartMonth").get(0).getContext("2d");
 
         var monthToBepassed = $('#monthChartmonth option:selected').text();
-            console.log(monthToBepassed);
+            // console.log(monthToBepassed);
 
         var buildMonthlyChart = function(evt) {
             var monthToBepassed = $('#monthChartmonth option:selected').text();
@@ -92,6 +94,24 @@
             });
         };
 
+        // Code for the door id dropdown option
+        function populateDoors(){
+            var secondMonthToBepassed = $('#buildingChartmonth option:selected').text();
+            var buildingToBepassed = $('#buildingChartbuilding option:selected').text();
+            console.log(secondMonthToBepassed)
+            console.log(buildingToBepassed)
+            $.get("/door.json", {'month': secondMonthToBepassed, 'building' : buildingToBepassed}, 
+                function (data_door) {
+                    $('.tbr').remove()
+                    for (var key in data_door) { 
+                        var doors_list = data_door[key];
+                        doors_list.forEach(function(t) { 
+                            $('#buildingChartdoor').append('<option class="tbr">'+t+'</option>');
+                        });
+                    }
+             });
+        }
+
         // This is the code needed to build the chart based on the user's
         // selection of the month and building name
         var ctx_bubble_B = $("#bubbleChartBuilding").get(0).getContext("2d");
@@ -100,34 +120,22 @@
             $('.door_btn').remove();
             var secondMonthToBepassed = $('#buildingChartmonth option:selected').text();
             var buildingToBepassed = $('#buildingChartbuilding option:selected').text();
+            var doorToBePassed = $('#buildingChartdoor option:selected').text();
             evt.preventDefault(); 
-            $.get("/building.json", {'month': secondMonthToBepassed, 'building' : buildingToBepassed}, function (data) {
-
-                for (var key in data) { 
-                    var charts_list = data[key];
-                    var charts_list_len = charts_list.length;
-                    for (var i = 0; i<charts_list_len; i++) {
-                        var myBubbleChart = new Chart(ctx_bubble_B,{
+            $.get("/building.json", 
+                {
+                 'month': secondMonthToBepassed, 
+                 'building' : buildingToBepassed, 
+                 "door": doorToBePassed
+                }, 
+                function (data) {
+                    var myBubbleChart = new Chart(ctx_bubble_B,{
                         type: 'bubble',
-                        data: charts_list[i],
+                        data: data,
                         options: my_options 
-                });
-                        // Code for making the buttons for the building charts to toggle which door chart to show
-                        var button_div = document.getElementById('door_ids_dynamic')
-                        var btn = document.createElement("BUTTON");
-                        // getting the label for the buttons
-                        for (var data_key in charts_list) {
-                            console.log(data_key[i])
-                        }
-                        var num_btn = i;
-                        var btn_label = document.createTextNode(num_btn);
-                        btn.appendChild(btn_label);
-                        btn.setAttribute('class', 'door_btn')
-                        btn.setAttribute('id', i)
-                        button_div.appendChild(btn);
-        
-                    }}
-            });
+                    });
+                }
+            );
         };
         // this is the end of making chart by building by month
         
@@ -135,12 +143,7 @@
         // Event listners that will call the functions to build the charts        
         $('#submitformonthlychart').click(buildMonthlyChart);
         $('#submitforbuildingchart').click(buildBuildingChart);
-    
-
-        
-
-
-
+        $('#buildingChartbuilding').change(populateDoors);
 
     </script>
 
