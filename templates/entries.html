@@ -15,8 +15,6 @@
             </select>
             <input type='submit' id='submitformonthlychart'>
         </form>
-
-
         <div class='monthly-chart'>
             <canvas id='bubbleChartMonth'></canvas>
         </div>
@@ -27,14 +25,14 @@
         <form>
             Select the month, building and door id which you'd like to view the log (logs are viewable for the next 6 months). <br>
             Select month:
-            <select name="month">
+            <select name="month" id='buildingChartmonth'>
               <option value='none'></option>
               {% for month in available_months %}
               <option value={{ month }}> {{month}} </option>
               {% endfor %}
             </select>
             Select building:
-            <select name="building">
+            <select name="building" id='buildingChartbuilding'>
               <option value='none'></option>
               {% for building in available_buildings %}
               <option value={{ building }}> {{building}} </option>
@@ -42,6 +40,9 @@
             </select>
             <input type='submit' id='submitforbuildingchart'>
         </form>
+        <div id='door_ids_dynamic'>
+            <!-- adding in dynamically numbered?amount? buttons here -->
+        </div>
         <div id='byBuildingChart'>
             <div class='monthly-chart'>
                 <canvas id='bubbleChartBuilding'></canvas>
@@ -51,11 +52,13 @@
 
     <!-- This the JS script that generates the charts-->
     <script>
+        // This one deafults the ticks on the charts to 1. 
         Chart.scaleService.updateScaleDefaults('linear', {
         ticks: {
             stepSize: 1
         }})
         
+        // This are the options for the charts
         var my_options = {
             reposive:true,
             maintainAspectRatio:true,
@@ -69,7 +72,8 @@
                         min: 0  } }]
             }   
         }
-
+        // This is the code needed to build the chart based on the user's 
+        // selection of the month
         var ctx_bubble_M = $("#bubbleChartMonth").get(0).getContext("2d");
 
         var monthToBepassed = $('#monthChartmonth option:selected').text();
@@ -77,7 +81,6 @@
 
         var buildMonthlyChart = function(evt) {
             var monthToBepassed = $('#monthChartmonth option:selected').text();
-            console.log(monthToBepassed);
             evt.preventDefault(); 
             $.get("/monthly.json", {'month': monthToBepassed}, function (data) {
                 var myBubbleChart = new Chart(ctx_bubble_M,{
@@ -88,20 +91,32 @@
             });
         };
 
-
+        // This is the code needed to build the chart based on the user's
+        // selection of the month and building name
         var ctx_bubble_B = $("#bubbleChartBuilding").get(0).getContext("2d");
 
-        $.get("/building.json", function (data) { 
-        var myBubbleChart = new Chart(ctx_bubble_B,{
-        type: 'bubble',
-        data: data,
-        options: my_options        
-        });
-        });
+        var buildBuildingChart = function(evt) {
+            var secondMonthToBepassed = $('#buildingChartmonth option:selected').text();
+            var buildingToBepassed = $('#buildingChartbuilding option:selected').text();
+            evt.preventDefault(); 
+            $.get("/building.json", {'month': secondMonthToBepassed, 'building' : buildingToBepassed}, function (data) {
+
+                for (var key in data) { 
+                    var charts_list = data[key];
+                    var charts_list_len = charts_list.length;
+                    for (var i = 0; i<charts_list_len; i++) {
+                        var myBubbleChart = new Chart(ctx_bubble_B,{
+                        type: 'bubble',
+                        data: charts_list[i],
+                        options: my_options 
+                });}}
+            });
+        };
+        // this is the end of making chart by building by month
 
         // Event listners that will call the functions to build the charts        
         $('#submitformonthlychart').click(buildMonthlyChart);
-
+        $('#submitforbuildingchart').click(buildBuildingChart);
 
 
     </script>
