@@ -255,29 +255,20 @@ def monthly_logs_data():
 @app.route('/door.json')
 def door_data():
     """Returns door options to populate dropdown"""
-    # getting all the variables set 
-    year = 2016
-    month = request.args.get('month')
-    print month
-    month = int(month)
-    #number of days in a month
-    num_days = calendar.monthrange(year, month)[1]
-    start_date = datetime.date(year, month, 1)
-    end_date = datetime.date(year, month, num_days)
+    # get the building choosen from the page
     building_name = request.args.get('building')
     building_name = building_name.strip()
     building_choosen = Building.query.filter(Building.building_name == building_name).first()
     building_id = building_choosen.building_id
     doors_of_choosen_building = Entrance.query.filter(Entrance.building_id == building_id).all()
 
+    # making a list of available doors in that building
     doors_list = []
-
     for each_door_in_building in doors_of_choosen_building:
         door_choosen = each_door_in_building.entrance_id
         doors_list.append(door_choosen)
 
-    print doors_list
-
+    # sends over that list of doors 
     return jsonify({'doors_list':doors_list})
 
 
@@ -331,15 +322,7 @@ def building_logs_data():
                 byday_dict[entrybybuilding.datentime.date().day] = byhour_dict
             dict_of_entries[entrybybuilding.entrance_id] = byday_dict
     
-    list_color = ['#0001ff', '#59fa67', '#fff138',
-                  '#e62600', '#dd3cc4', '#b7cb34',
-                  '#0001ff', '#59fa67', '#fff138',
-                  '#e62600', '#dd3cc4', '#b7cb34',
-                  '#0001ff', '#59fa67', '#fff138',
-                  '#e62600', '#dd3cc4', '#b7cb34',
-                  '#0001ff', '#59fa67', '#fff138',
-                  '#e62600', '#dd3cc4', '#b7cb34',
-                  '#ff6600', '#22dc09', '#af040c']
+    list_color = ['#0001ff', '#59fa67', '#fff138']
 
     # largest structure, the value is a list of dictionaries
     building_dict = {'datasets': []}

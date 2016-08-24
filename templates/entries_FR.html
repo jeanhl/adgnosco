@@ -1,12 +1,10 @@
-
-
 {% extends 'base.html' %}
 {% block content %}
 <body>
-    <!-- This div is all about the monthly chart. Getting a specific month and displaying it -->
-    <div id='byMonthChart'>
+    <!-- This div is all about the monthly chart for data from the cameras. Getting a specific month and displaying it -->
+    <div id='byMonthChartFR'>
         <form>
-            Select the month which you'd like to view the log (logs are viewable for the next 6 months):
+            Select the month which you'd like to view entries captured by the cameras.
             <br>
             <select name="month" id='monthChartmonth'>
               <option value='none'></option>
@@ -21,10 +19,11 @@
         </div>
     </div>
 
-    <!-- This div is all about the building chart. Getting a specific month, building and door and displaying it -->
-    <div id='byBuildingChart'>
+    <!-- This div is all about the building chart for data from the cameras. Getting a specific month, building and door and displaying it -->
+    <div id='byBuildingChartFR'>
         <form>
-            Select the month, building and door id which you'd like to view the log (logs are viewable for the next 6 months). <br>
+            Select the month, building and door id which you'd like to view the log.
+             <br>
             <!-- getting the month -->
             Select month:
             <select name="month" id='buildingChartmonth'>
@@ -86,7 +85,7 @@
         var buildMonthlyChart = function(evt) {
             var monthToBepassed = $('#monthChartmonth option:selected').text();
             evt.preventDefault(); 
-            $.get("/monthly.json", {'month': monthToBepassed}, function (data) {
+            $.get("/monthlyFR.json", {'month': monthToBepassed}, function (data) {
                 var myBubbleChart = new Chart(ctx_bubble_M,{
                 type: 'bubble',
                 data: data,
@@ -101,6 +100,7 @@
             var buildingToBepassed = $('#buildingChartbuilding option:selected').text();
             console.log(secondMonthToBepassed)
             console.log(buildingToBepassed)
+            // uses the same route as entries.html
             $.get("/door.json", {'month': secondMonthToBepassed, 'building' : buildingToBepassed}, 
                 function (data_door) {
                     $('.tbr').remove()
@@ -123,7 +123,7 @@
             var buildingToBepassed = $('#buildingChartbuilding option:selected').text();
             var doorToBePassed = $('#buildingChartdoor option:selected').text();
             evt.preventDefault(); 
-            $.get("/building.json", 
+            $.get("/buildingFR.json", 
                 {
                  'month': secondMonthToBepassed, 
                  'building' : buildingToBepassed, 

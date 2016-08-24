@@ -70,7 +70,7 @@ class Entries(db.Model):
     person_id = db.Column(db.Integer, db.ForeignKey('personnels.person_id'), nullable=False)
     entrance_id = db.Column(db.Integer, db.ForeignKey('entrances.entrance_id'), nullable=False)
     building_id = db.Column(db.Integer, db.ForeignKey('buildings.building_id'), nullable=False)
-    datentime = db.Column(db.DateTime, nullable=False)
+    datentime = db.Column(db.DateTime(timezone=True), nullable=False)
 
     # Defining relationships to person, entrance, building
     person = db.relationship("Personnel",
@@ -88,6 +88,34 @@ class Entries(db.Model):
                                                                                                   self.entrance_id,
                                                                                                   self.building_id,
                                                                                                   self.datentime)
+
+# class Recognized(db.Model):
+#     """ Individual recognized through facial recognition feature. """
+
+#     __tablename__ = "entries"
+
+#     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+#     person_id = db.Column(db.Integer, db.ForeignKey('personnels.person_id'), nullable=False)
+#     entrance_id = db.Column(db.Integer, db.ForeignKey('entrances.entrance_id'), nullable=False)
+#     building_id = db.Column(db.Integer, db.ForeignKey('buildings.building_id'), nullable=False)
+#     datentime = db.Column(db.DateTime(timezone=True), nullable=False)
+
+#     # Defining relationships to person, entrance, building
+#     person = db.relationship("Personnel",
+#                              backref=db.backref("entry"))
+#     entrance = db.relationship("Entrance",
+#                                backref=db.backref("entry"))
+#     building = db.relationship("Building",
+#                                backref=db.backref("entry"))
+
+#     def __repr__(self):
+#         """Provide helpful representation when printed."""
+
+#         return "< Entry id: %d  Person id: %d  Entrance id: %d   Building id: %d   At: %s   >" % (self.id,
+#                                                                                                   self.person_id,
+#                                                                                                   self.entrance_id,
+#                                                                                                   self.building_id,
+#                                                                                                   self.datentime)
 
 
 ##############################################################################
