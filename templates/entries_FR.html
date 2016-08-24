@@ -14,8 +14,8 @@
             </select>
             <input type='submit' id='submitformonthlychart'>
         </form>
-        <div class='monthly-chart'>
-            <canvas id='bubbleChartMonth'></canvas>
+        <div class='monthly-chart'> 
+            <canvas id='bubbleChartMonthFR'></canvas>
         </div>
     </div>
 
@@ -50,7 +50,7 @@
         </form>
         <div id='byBuildingChart'>
             <div class='monthly-chart'>
-                <canvas id='bubbleChartBuilding'></canvas>
+                <canvas id='bubbleChartBuildingFR'></canvas>
             </div>
         </div>
     </div>
@@ -75,18 +75,15 @@
                         min: 0  } }]
             }   
         };
-        // This is the code needed to build the chart based on the user's 
+        // This is the code needed to build the FR chart based on the user's 
         // selection of the month
-        var ctx_bubble_M = $("#bubbleChartMonth").get(0).getContext("2d");
-
-        var monthToBepassed = $('#monthChartmonth option:selected').text();
-            // console.log(monthToBepassed);
-
-        var buildMonthlyChart = function(evt) {
+        var ctx_bubble_M_FR = $("#bubbleChartMonthFR").get(0).getContext("2d");
+        var monthToBepassed2 = $('#monthChartmonth option:selected').text();
+        var buildMonthlyChart2 = function(evt) {
             var monthToBepassed = $('#monthChartmonth option:selected').text();
             evt.preventDefault(); 
-            $.get("/monthlyFR.json", {'month': monthToBepassed}, function (data) {
-                var myBubbleChart = new Chart(ctx_bubble_M,{
+            $.get("/monthlyFR.json", {'month': monthToBepassed2}, function (data) {
+                var myBubbleChart = new Chart(ctx_bubble_M_FR,{
                 type: 'bubble',
                 data: data,
                 options: my_options        
@@ -113,11 +110,10 @@
              });
         }
 
-        // This is the code needed to build the chart based on the user's
+        // This is the code needed to build the FR chart based on the user's
         // selection of the month and building name
-        var ctx_bubble_B = $("#bubbleChartBuilding").get(0).getContext("2d");
-
-        var buildBuildingChart = function(evt) {
+        var ctx_bubble_B_FR = $("#bubbleChartBuilding_FR").get(0).getContext("2d");
+        var buildBuildingChart2 = function(evt) {
             $('.door_btn').remove();
             var secondMonthToBepassed = $('#buildingChartmonth option:selected').text();
             var buildingToBepassed = $('#buildingChartbuilding option:selected').text();
@@ -130,7 +126,7 @@
                  "door": doorToBePassed
                 }, 
                 function (data) {
-                    var myBubbleChart = new Chart(ctx_bubble_B,{
+                    var myBubbleChart = new Chart(ctx_bubble_B_FR,{
                         type: 'bubble',
                         data: data,
                         options: my_options 
@@ -138,7 +134,7 @@
                 }
             );
         };
-        // this is the end of making chart by building by month
+        // this is the end of making chart by building by month for FR
         
 
         // Event listners that will call the functions to build the charts        

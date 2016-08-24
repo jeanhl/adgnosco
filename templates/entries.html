@@ -15,9 +15,13 @@
               {% endfor %}
             </select>
             <input type='submit' id='submitformonthlychart'>
-        </form>
+        </form><br><br>
         <div class='monthly-chart'>
-            <canvas id='bubbleChartMonth'></canvas>
+            <p class='appearchartinfo' hidden=True> Keyless entries for the month by door id
+            </p>
+            <canvas id='bubbleChartMonth'></canvas><br>
+            <p class='appearchartinfo' hidden=True> Camera detected entries for the month by door id </p>
+            <canvas id='bubbleChartMonthFR'></canvas>
         </div>
     </div>
 
@@ -48,10 +52,13 @@
             </select>
             <!-- submit button for the whole form -->
             <input type='submit' id='submitforbuildingchart'>
-        </form>
+        </form><br><br>
         <div id='byBuildingChart'>
             <div class='monthly-chart'>
-                <canvas id='bubbleChartBuilding'></canvas>
+                <p class='appearchartinfo2' hidden=True> Keyless entries for the month and building by the hour </p>
+                <canvas id='bubbleChartBuilding'></canvas><br>
+                <p class='appearchartinfo2' hidden=True> Camera detected entries for the month and building by the hour </p>
+                <canvas id='bubbleChartBuildingFR'></canvas>
             </div>
         </div>
     </div>
@@ -79,24 +86,41 @@
         // This is the code needed to build the chart based on the user's 
         // selection of the month
         var ctx_bubble_M = $("#bubbleChartMonth").get(0).getContext("2d");
-
         var monthToBepassed = $('#monthChartmonth option:selected').text();
-            // console.log(monthToBepassed);
-
         var buildMonthlyChart = function(evt) {
+            console.log("YOU CALLED buildMonthlyChart~~~~")
             var monthToBepassed = $('#monthChartmonth option:selected').text();
             evt.preventDefault(); 
-            $.get("/monthly.json", {'month': monthToBepassed}, function (data) {
+            $.get("/monthly.json", {'month': monthToBepassed}, function (data_m) {
                 var myBubbleChart = new Chart(ctx_bubble_M,{
                 type: 'bubble',
-                data: data,
+                data: data_m,
                 options: my_options        
                 });
             });
         };
 
+        // This is the code needed to build the FR chart based on the user's 
+        // selection of the month
+        var ctx_bubble_M_FR = $("#bubbleChartMonthFR").get(0).getContext("2d");
+        var monthToBepassed2 = $('#monthChartmonth option:selected').text();
+        var buildMonthlyChart2 = function(evt) {
+            console.log("YOU CALLED buildMonthlyChart   2   ~~~~")
+            var monthToBepassed = $('#monthChartmonth option:selected').text();
+            evt.preventDefault(); 
+            $.get("/monthlyFR.json", {'month': monthToBepassed}, function (FRdata_m) {
+                var myBubbleChart = new Chart(ctx_bubble_M_FR,{
+                type: 'bubble',
+                data: FRdata_m,
+                options: my_options        
+                });
+            });
+        };
+
+
         // Code for the door id dropdown option
         function populateDoors(){
+            console.log("YOU CALLED populateDoors~~~~")
             var secondMonthToBepassed = $('#buildingChartmonth option:selected').text();
             var buildingToBepassed = $('#buildingChartbuilding option:selected').text();
             console.log(secondMonthToBepassed)
@@ -129,21 +153,54 @@
                  'building' : buildingToBepassed, 
                  "door": doorToBePassed
                 }, 
-                function (data) {
+                function (data_b) {
                     var myBubbleChart = new Chart(ctx_bubble_B,{
                         type: 'bubble',
-                        data: data,
+                        data: data_b,
                         options: my_options 
                     });
                 }
             );
         };
         // this is the end of making chart by building by month
+
+        // This is the code needed to build the FR chart based on the user's
+        // selection of the month and building name
+        var ctx_bubble_B_FR = $("#bubbleChartBuildingFR").get(0).getContext("2d");
+        var buildBuildingChart2 = function(evt) {
+            var secondMonthToBepassed = $('#buildingChartmonth option:selected').text();
+            var buildingToBepassed = $('#buildingChartbuilding option:selected').text();
+            var doorToBePassed = $('#buildingChartdoor option:selected').text();
+            evt.preventDefault(); 
+            $.get("/buildingFR.json", 
+                {
+                 'month': secondMonthToBepassed, 
+                 'building' : buildingToBepassed, 
+                 "door": doorToBePassed
+                }, 
+                function (FRdata_b) {
+                    var myBubbleChart = new Chart(ctx_bubble_B_FR,{
+                        type: 'bubble',
+                        data: FRdata_b,
+                        options: my_options 
+                    });
+                }
+            );
+        };
+        // this is the end of making chart by building by month for FR
         
 
         // Event listners that will call the functions to build the charts        
         $('#submitformonthlychart').click(buildMonthlyChart);
+        $('#submitformonthlychart').click(buildMonthlyChart2);
+        $('#submitformonthlychart').click(function(){
+            $('.appearchartinfo').show()
+        });
         $('#submitforbuildingchart').click(buildBuildingChart);
+        $('#submitforbuildingchart').click(buildBuildingChart2);
+        $('#submitforbuildingchart').click(function(){
+            $('.appearchartinfo2').show()
+        });
         $('#buildingChartbuilding').change(populateDoors);
 
     </script>
