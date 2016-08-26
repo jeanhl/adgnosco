@@ -105,6 +105,31 @@ def load_entries():
     #commiting the changes to update the database
     db.session.commit()
 
+def load_recognized():
+    """Load entries from recognized into database."""
+
+    print "Recognized"
+
+    for i, row in enumerate(open("seed_data/recognized.csv")):
+        row = row.rstrip()
+        id, person_id, entrance_id, building_id, datentime = row.split(",")
+
+        recognized = Recognized(id=id,
+                        person_id=person_id,
+                        entrance_id=entrance_id,
+                        building_id=building_id,
+                        datentime=datentime)
+
+        #adding to the session
+        db.session.add(recognized)
+
+        # provide some sense of progress
+        if i % 100 == 0:
+            print i
+
+    #commiting the changes to update the database
+    db.session.commit()
+
 
 def set_val_entry_id():
     """Set value for the next entry id after seeding database"""

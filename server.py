@@ -1,14 +1,20 @@
 """Adgnosco Server"""
 
 import arrow
+import schedule
 import datetime
 import calendar
+import os
+import requests
+import json
 from collections import defaultdict
 from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy import func
 from model import Entrance, Building, Personnel, Entries, connect_to_db, db
+from apscheduler.schedulers.background import BackgroundScheduler
+# from backgrounders.py import get_nest_api ????
 
 app = Flask(__name__)
 
@@ -19,7 +25,19 @@ app.secret_key = "ABC"
 # This is horrible. Fix this so that, instead, it raises an error.
 app.jinja_env.undefined = StrictUndefined
 
+# Scheduler Section for findng .jpg in a directory and feed them into OpenFace
+sched = BackgroundScheduler()
 
+@sched.scheduled_job('interval', id='my_job_id', seconds=30)
+def my_interval_job():
+    print 'Hello World!'
+    os.chdir('/home/vagrant/src/fr_project')
+    os.system("python -m thing.openface-master.demos.classifier infer thing/openface-master/classifier0823.pkl thing/openface-master/Yun1.jpg")
+
+sched.start()
+
+
+# -- Server routes sections starting now -- 
 @app.route('/')
 def index():
     """Homepage."""
@@ -211,7 +229,6 @@ def monthly_logs_data():
 
     year = 2016
     month = request.args.get('month')
-    print "Month = ", month
     month = int(month)
     
 
