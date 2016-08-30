@@ -89,33 +89,33 @@ class Entries(db.Model):
                                                                                                   self.building_id,
                                                                                                   self.datentime)
 
-# class Recognized(db.Model):
-#     """ Individual recognized through facial recognition feature. """
+class Recognized(db.Model):
+    """ Individual recognized through facial recognition feature. """
 
-#     __tablename__ = "entries"
+    __tablename__ = "recognized"
 
-#     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-#     person_id = db.Column(db.Integer, db.ForeignKey('personnels.person_id'), nullable=False)
-#     entrance_id = db.Column(db.Integer, db.ForeignKey('entrances.entrance_id'), nullable=False)
-#     building_id = db.Column(db.Integer, db.ForeignKey('buildings.building_id'), nullable=False)
-#     datentime = db.Column(db.DateTime(timezone=True), nullable=False)
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    person_id = db.Column(db.Integer, db.ForeignKey('personnels.person_id'), nullable=False)
+    entrance_id = db.Column(db.Integer, db.ForeignKey('entrances.entrance_id'), nullable=False)
+    building_id = db.Column(db.Integer, db.ForeignKey('buildings.building_id'), nullable=False)
+    datentime = db.Column(db.DateTime(timezone=True), nullable=False)
 
-#     # Defining relationships to person, entrance, building
-#     person = db.relationship("Personnel",
-#                              backref=db.backref("entry"))
-#     entrance = db.relationship("Entrance",
-#                                backref=db.backref("entry"))
-#     building = db.relationship("Building",
-#                                backref=db.backref("entry"))
+    # Defining relationships to person, entrance, building
+    person = db.relationship("Personnel",
+                             backref=db.backref("recognized"))
+    entrance = db.relationship("Entrance",
+                               backref=db.backref("recognized"))
+    building = db.relationship("Building",
+                               backref=db.backref("recognized"))
 
-#     def __repr__(self):
-#         """Provide helpful representation when printed."""
+    def __repr__(self):
+        """Provide helpful representation when printed."""
 
-#         return "< Entry id: %d  Person id: %d  Entrance id: %d   Building id: %d   At: %s   >" % (self.id,
-#                                                                                                   self.person_id,
-#                                                                                                   self.entrance_id,
-#                                                                                                   self.building_id,
-#                                                                                                   self.datentime)
+        return "< Recognized id: %d  Person id: %d  Entrance id: %d   Building id: %d   At: %s   >" % (self.id,
+                                                                                                  self.person_id,
+                                                                                                  self.entrance_id,
+                                                                                                  self.building_id,
+                                                                                                  self.datentime)
 
 
 ##############################################################################

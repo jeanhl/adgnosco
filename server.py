@@ -5,9 +5,11 @@ import schedule
 import datetime
 import calendar
 import os
+import glob
 import requests
 import json
 from collections import defaultdict
+from os import listdir
 from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
@@ -24,20 +26,33 @@ app.secret_key = "ABC"
 # Normally, if you use an undefined variable in Jinja2, it fails silently.
 # This is horrible. Fix this so that, instead, it raises an error.
 app.jinja_env.undefined = StrictUndefined
-
-# Scheduler Section for findng .jpg in a directory and feed them into OpenFace
 sched = BackgroundScheduler()
 
-@sched.scheduled_job('interval', id='my_job_id', seconds=30)
+
+@sched.scheduled_job('interval', id='my_job_id', seconds=15)
 def my_interval_job():
-    print 'Hello World!'
-    os.chdir('/home/vagrant/src/fr_project')
-    os.system("python -m thing.openface-master.demos.classifier infer thing/openface-master/classifier0823.pkl thing/openface-master/Yun1.jpg")
+    print "Scheduler toggled! ~~~~~~~~~~~~~~~~~"
+    # print 'Scheduler for facial recognition is running'
+    # os.chdir('/home/vagrant/src/fr_project')
+    # os.system("python -m thing.openface-master.demos.classifier infer thing/openface-master/classifier0823.pkl thing/openface-master/Yun1.jpg")
 
-sched.start()
+
+@app.route('/fr_call.json')
+def controls_the_feeding_of_imgs_into_OpenFace():
+# Scheduler Section for findng .jpg in a directory and feed them into OpenFace
+    fr_dict = {}
+    fr_instruction = request.args.get('fr_instruction')
+    fr_instruction = str(fr_instruction)
+    fr_instruction = fr_instruction.strip()
+
+    if fr_instruction == 'fr_yes':
+        sched.start()
+    else:
+        sched.shutdown()
+
+    return jsonify(fr_dict)
 
 
-# -- Server routes sections starting now -- 
 @app.route('/')
 def index():
     """Homepage."""
@@ -79,17 +94,6 @@ def profile_page():
     # only shows the profile of whoever is in the session
     person_id = session['user_id']
     user = Personnel.query.filter_by(person_id=person_id).first()
-
-
-    # Have the details of the user. DONE
-    # Have a button to go:
-        # remote access to a door DONE
-        # view their entry logs DONE MAYBE
-    # Manager:
-        # Be able to view logs DONE MAYBE
-        # Be able to register a user DONE
-        # Reach: Be able to change key code of a user
-        # Reach: Be able to deactivate a user
 
     return render_template('profilepage.html', user=user)
 
@@ -294,7 +298,6 @@ def monthly_logs_FRdata():
 
     year = 2016
     month = request.args.get('month')
-    print "Month = ", month
     month = int(month)
     
 
@@ -507,6 +510,36 @@ def building_logs_FRdata():
         count += 1
 
     return jsonify(building_dict)
+
+@app.route('/manual_review')
+def show_page_for_manual_review():
+    # this is to pass over the .gif files that could not be verified by facial recognition
+
+    list_img_files = []
+
+    for img_file in os.listdir('/home/vagrant/src/fr_project/thing/static/ManualCheck'):
+        if img_file.endswith('.gif'):
+            # filepath_to_be_passed = '/animatedCaptured/ManualCheck/'+img_file
+            list_img_files.append(img_file)
+    
+    return render_template('manualreview.html', list_img_files=list_img_files)
+
+
+@app.route('/move_animated')
+def move_animated_to_process():
+# script that moves the gif to the Processed folder
+    emp_jsn = {}
+    photo_selected = request.args.get('photo')
+
+    os.chdir("/home/vagrant/src/fr_project/thing/static/ManualCheck/")
+    os.system("mv " + photo_selected + " /home/vagrant/src/fr_project/thing/animatedCaptured/Processed")
+    os.chdir("/home/vagrant/src/fr_project/thing/stillCaptured/ManualCheck/")
+    os.system("mv " + photo_selected[:-4] + ".jpg /home/vagrant/src/fr_project/thing/stillCaptured/processed")
+
+    return jsonify(emp_jsn)
+
+
+
 
 
 if __name__ == "__main__":

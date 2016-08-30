@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<div>
+    <p> Start or Stop the NestCam streaming </p>
+    <form>
+        <input type='submit' id='api_call' value='Start NestCam Streaming'>
+        <input type='submit' id='api_call' value='Stop NestCam Streaming'>
+    </form>
+    <p> Start or Stop the facial recognition process </p>
+
+    <div id="infoFR"> 
+        <input type='submit' class='fr_btn' id='fr_yes' value='Start FR Process'>
+        <input type='submit' class='fr_btn' id='fr_no' value='Stop FR Process' style="display:none">          
+    </div>
+</div>
+
+<p>The following events could not be verified by the program. Please review them:</p>
+
+<div>
+    {% for img in list_img_files %}
+    <img class='photosForReview' src= {{ url_for('static', filename = 'ManualCheck/'+img) }} id={{img}} width="200">
+    {% endfor %}
+</div>
+
+<script>
+    var removePhoto = function(evt){
+        // change this later to send to server so that the script for moving files is called
+        var photo_value = evt.currentTarget.id
+        $.get('/move_animated', {'photo' : photo_value}, function(data){
+            $(evt.currentTarget).remove();
+        });
+    };
+
+    var toggleFR = function(evt){
+        var fr_instruction = evt.currentTarget.id
+        console.log(fr_instruction)
+        $.get('/fr_call.json', {'fr_instruction' : fr_instruction}, function(data){
+            $("#infoFR input").toggle();
+        });    
+    }
+
+    $("#infoFR input").click(toggleFR);
+    $('.photosForReview').click(removePhoto);
+</script>
+
+
+{% endblock %}

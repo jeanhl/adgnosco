@@ -1,8 +1,12 @@
-
-
 {% extends 'base.html' %}
 {% block content %}
 <body>
+    <!-- A button to go to the page for manually reviewing events -->
+    <div>
+        <form action='/manual_review'>
+            <input type='submit' value='Manual Review Events'>
+        </form>
+    </div>
     <!-- This div is all about the monthly chart. Getting a specific month and displaying it -->
     <div id='byMonthChart'>
         <form>
@@ -88,7 +92,6 @@
         var ctx_bubble_M = $("#bubbleChartMonth").get(0).getContext("2d");
         var monthToBepassed = $('#monthChartmonth option:selected').text();
         var buildMonthlyChart = function(evt) {
-            console.log("YOU CALLED buildMonthlyChart~~~~")
             var monthToBepassed = $('#monthChartmonth option:selected').text();
             evt.preventDefault(); 
             $.get("/monthly.json", {'month': monthToBepassed}, function (data_m) {
@@ -105,7 +108,6 @@
         var ctx_bubble_M_FR = $("#bubbleChartMonthFR").get(0).getContext("2d");
         var monthToBepassed2 = $('#monthChartmonth option:selected').text();
         var buildMonthlyChart2 = function(evt) {
-            console.log("YOU CALLED buildMonthlyChart   2   ~~~~")
             var monthToBepassed = $('#monthChartmonth option:selected').text();
             evt.preventDefault(); 
             $.get("/monthlyFR.json", {'month': monthToBepassed}, function (FRdata_m) {
@@ -120,11 +122,8 @@
 
         // Code for the door id dropdown option
         function populateDoors(){
-            console.log("YOU CALLED populateDoors~~~~")
             var secondMonthToBepassed = $('#buildingChartmonth option:selected').text();
             var buildingToBepassed = $('#buildingChartbuilding option:selected').text();
-            console.log(secondMonthToBepassed)
-            console.log(buildingToBepassed)
             $.get("/door.json", {'month': secondMonthToBepassed, 'building' : buildingToBepassed}, 
                 function (data_door) {
                     $('.tbr').remove()

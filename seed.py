@@ -1,6 +1,6 @@
 """Utility file to seed access database from seed data in seed_data/"""
 
-from model import Entrance, Building, Personnel, Entries, connect_to_db, db
+from model import Entrance, Building, Personnel, Entries, Recognized, connect_to_db, db
 from server import app
 from sqlalchemy import func
 
