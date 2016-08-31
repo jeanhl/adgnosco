@@ -2,25 +2,27 @@
 {% block content %}
 
 
-<div>
-    <p> Start or Stop the NestCam streaming </p>
-    <form>
-        <input type='submit' id='api_call' value='Start NestCam Streaming'>
-        <input type='submit' id='api_call' value='Stop NestCam Streaming'>
-    </form>
-    <p> Start or Stop the facial recognition process </p>
 
-    <div id="infoFR"> 
-        <input type='submit' class='fr_btn' id='fr_yes' value='Start FR Process'>
-        <input type='submit' class='fr_btn' id='fr_no' value='Stop FR Process' style="display:none">          
-    </div>
+<div id='infoAPI'>
+    <p> Start or Stop the NestCam streaming </p>
+    <input type='submit' class='api_btn' id='api_yes' value='Start NestCam Streaming'>
+    <input type='submit' class='api_btn' id='api_no' value='Stop NestCam Streaming' style="display:none">
 </div>
+
+
+<div id="infoFR"> 
+    <p> Start or Stop the facial recognition process </p>
+    <input type='submit' class='fr_btn' id='fr_yes' value='Start FR Process'>
+    <input type='submit' class='fr_btn' id='fr_no' value='Stop FR Process' style="display:none">          
+</div>
+
 
 <p>The following events could not be verified by the program. Please review them:</p>
 
 <div>
     {% for img in list_img_files %}
     <img class='photosForReview' src= {{ url_for('static', filename = 'ManualCheck/'+img) }} id={{img}} width="200">
+    <!-- <button   id = {img}  >-->
     {% endfor %}
 </div>
 
@@ -41,6 +43,15 @@
         });    
     }
 
+    var toggleAPI = function(evt){
+        var api_instruction = evt.currentTarget.id
+        console.log(api_instruction)
+        $.get('/api_call.json', {'api_instruction' : api_instruction}, function(data){
+            $("#infoAPI input").toggle();
+        });    
+    }
+
+    $("#infoAPI input").click(toggleAPI);
     $("#infoFR input").click(toggleFR);
     $('.photosForReview').click(removePhoto);
 </script>

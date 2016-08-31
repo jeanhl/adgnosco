@@ -16,7 +16,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy import func
 from model import Entrance, Building, Personnel, Entries, connect_to_db, db
 from apscheduler.schedulers.background import BackgroundScheduler
-# from backgrounders.py import get_nest_api ????
+from backgrounders import get_nest_api 
 
 app = Flask(__name__)
 
@@ -51,6 +51,24 @@ def controls_the_feeding_of_imgs_into_OpenFace():
         sched.shutdown()
 
     return jsonify(fr_dict)
+
+
+@app.route('/api_call.json')
+def controls_the_Nest_Streaming_API():
+# Starts or Stops the streaming of information from NestCam
+    api_dict = {}
+    api_instruction = request.args.get('api_instruction')
+    api_instruction = str(api_instruction)
+    api_instruction = api_instruction.strip()
+
+    if api_instruction == 'api_yes':
+        print "You have started Nest API"
+        get_nest_api()
+    else:
+        print "You will stop Nest API"
+        get_nest_api.quit()
+
+    return jsonify(api_dict)
 
 
 @app.route('/')
@@ -539,6 +557,47 @@ def move_animated_to_process():
     return jsonify(emp_jsn)
 
 
+#  ------------------------ Demo routes  ---------------------------- 
+#  ------------------------ Demo routes  ---------------------------- 
+@app.route('/demo_display_API')
+def show_demo_nestcam_gifs():
+    # for demo only, shows live API served .gifs
+
+    list_img_files = []
+
+    for img_file in os.listdir('/home/vagrant/src/fr_project/thing/static/demoAPI'):
+        if img_file.endswith('.gif'):
+            list_img_files.append(img_file)
+    
+    return render_template('demoNestAPI.html', list_img_files=list_img_files)
+
+
+@app.route('/demo_faces')
+def show_demo_faces():
+    # for demo only, shows Demo pictures
+
+    list_img_files = []
+
+    for img_file in os.listdir('/home/vagrant/src/fr_project/thing/static/demoFaces'):
+        if img_file.endswith('.jpg'):
+            list_img_files.append(img_file)
+    
+    return render_template('demofaces.html', list_img_files=list_img_files)
+
+
+@app.route('/demo_FR')
+def show_demo_fr():
+    # for demo only, sends over the pictures to OpenFace
+    img_files = []
+
+    for img_file in os.listdir('/home/vagrant/src/fr_project/thing/static/demoFaces'):
+        if img_file.endswith('.jpg'):
+            img_files.append(img_file)
+
+    for each_img in img_files:
+        os.chdir('/home/vagrant/src/fr_project')
+        os.system("python -m thing.openface-master.demos.classifier infer thing/openface-master/classifier0823.pkl thing/static/demoFaces/"+each_img)
+        # need to make a demo infer function or something so that it writes to the fake DB
 
 
 
