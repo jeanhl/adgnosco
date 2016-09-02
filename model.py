@@ -35,7 +35,7 @@ class Building(db.Model):
 
     building_id = db.Column(db.Integer, primary_key=True)
     building_name = db.Column(db.String(20), nullable=False)
-    building_address = db.Column(db.String(300), nullable=False)
+    building_address = db.Column(db.String(300), nullable=True)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -99,6 +99,7 @@ class Recognized(db.Model):
     entrance_id = db.Column(db.Integer, db.ForeignKey('entrances.entrance_id'), nullable=False)
     building_id = db.Column(db.Integer, db.ForeignKey('buildings.building_id'), nullable=False)
     datentime = db.Column(db.DateTime(timezone=True), nullable=False)
+    conf_lvl = db.Column(db.Float, nullable=True)
 
     # Defining relationships to person, entrance, building
     person = db.relationship("Personnel",

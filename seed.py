@@ -152,4 +152,5 @@ if __name__ == "__main__":
     load_personnel()
     load_entrance()    
     load_entries()
+    load_recognized()
     set_val_entry_id()

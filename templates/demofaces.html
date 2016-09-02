@@ -1,12 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
-
-
 <div>
-    <p> For this demo, we have these pictures that we got from the Nest API. </p>
-    {% for img in list_img_files %}
+<form action='/demo_FR'>
+    <input type='submit' value='Check Facial Recognition'>
+</form>
+</div>
+<div>
+    <p> For this demo, we have these pictures that we "got" from the Nest API. </p>
+    {% for img, dttm in list_img_dttm %}
     <img class='photosForReview' src= {{ url_for('static', filename = 'demoFaces/'+img) }} id={{img}} width="200">
-    {{img[:-4]}}
+    {{dttm}}
     <br>
     {% endfor %}
 </div>

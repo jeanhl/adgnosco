@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<div>
+    <p> After passing the images through OpenFace, these people are recognized as residents of this complex. </p>
+    {% for img, dttm, name, conf in list_img_dttm_passed %}
+    <img class='photosForReview' src= {{ url_for('static', filename = 'demoPassed/'+img) }} id={{img}} width="200"> <br>
+    Detection Time: {{dttm}} <br>
+    Resident Name: {{ name }} <br>
+    Recognition Confidence Level: {{conf*100}}%<br>
+    <br>
+    {% endfor %}
+</div>
+<br>
+<br>
+<div>
+    <p> These visitors are not not found in the database, please review these events. </p>
+    {% for img, dttm in list_img_dttm_failed %}
+    <img class='photosForReview' src= {{ url_for('static', filename = 'demoMnChk/'+img) }} id={{img}} width="200">
+    {{dttm}}
+    <br>
+    {% endfor %}
+</div>
+{% endblock %}

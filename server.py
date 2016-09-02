@@ -2,19 +2,20 @@
 
 import arrow
 import schedule
-import datetime
+import datetime as dt
 import calendar
 import os
 import glob
 import requests
 import json
 from collections import defaultdict
+from datetime import datetime
 from os import listdir
 from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy import func
-from model import Entrance, Building, Personnel, Entries, connect_to_db, db
+from model import Entrance, Building, Personnel, Entries, Recognized, connect_to_db, db
 from apscheduler.schedulers.background import BackgroundScheduler
 from backgrounders import get_nest_api 
 
@@ -86,6 +87,11 @@ def login_process():
     username = request.form.get("username")
     password = request.form.get("password")
 
+    # User ID 1 is reserved for unknown visitors. 
+    if username == 1:
+        flash("No such ID registered.")
+        return redirect('/')
+
     # checking to see if user is in database
     user = Personnel.query.filter_by(person_id=username).first()
 
@@ -103,6 +109,14 @@ def login_process():
 
     flash("Logged in successfully")
     return redirect('/profilepage')
+
+
+@app.route('/logout')
+def logout_process():
+    """Logs user out"""
+
+
+    return redirect('/')
 
 
 @app.route('/profilepage', methods=['GET'])
@@ -255,8 +269,8 @@ def monthly_logs_data():
     
 
     num_days = calendar.monthrange(year, month)[1]
-    start_date = datetime.date(year, month, 1)
-    end_date = datetime.date(year, month, num_days)
+    start_date = dt.date(year, month, 1)
+    end_date = dt.date(year, month, num_days)
 
     entries = (Entries.query.filter(Entries.datentime >= start_date,
                                     Entries.datentime <= end_date).all())
@@ -275,9 +289,9 @@ def monthly_logs_data():
                 inner_dict[day_of_month] += 1
         dict_of_entries[door.entrance_id] = inner_dict
 
-    list_color = ['#0001ff', '#59fa67', '#fff138',
-                  '#e62600', '#dd3cc4', '#b7cb34',
-                  '#ff6600', '#22dc09', '#af040c']
+    list_color = ['#FF5900', '#FF9A00', '#116ED5',
+                  '#00D696', '#46B235', '#28867C',
+                  '#D78040', '#D13F49', '#FFC498']
 
     # largest structure, the value is a list of dictionaries
     monthly_dict = {'datasets': []}
@@ -309,6 +323,7 @@ def monthly_logs_data():
 
     return jsonify(monthly_dict)
 
+
 @app.route('/monthlyFR.json')
 def monthly_logs_FRdata():
     """Return data about entries on a monthly basis caught by camera"""
@@ -317,14 +332,13 @@ def monthly_logs_FRdata():
     year = 2016
     month = request.args.get('month')
     month = int(month)
-    
 
     num_days = calendar.monthrange(year, month)[1]
-    start_date = datetime.date(year, month, 1)
-    end_date = datetime.date(year, month, num_days)
+    start_date = dt.date(year, month, 1)
+    end_date = dt.date(year, month, num_days)
 
-    entries = (Entries.query.filter(Entries.datentime >= start_date,
-                                    Entries.datentime <= end_date).all())
+    entries = (Recognized.query.filter(Recognized.datentime >= start_date,
+                                    Recognized.datentime <= end_date).all())
 
     # making nested dictionaries of the entries by door by day for the month specified
     # dict_of_doors  = {entrance_id1:{day1:count1, day2:count2},
@@ -333,7 +347,7 @@ def monthly_logs_FRdata():
     dict_of_entries = {}
     doors = Entrance.query.all()
     for door in doors:
-        entriess = Entries.query.filter(Entries.entrance_id == door.entrance_id).all()
+        entriess = Recognized.query.filter(Recognized.entrance_id == door.entrance_id).all()
         inner_dict = defaultdict(int)
         for entry in entriess:
             if entry.datentime.date().month == month:
@@ -341,9 +355,9 @@ def monthly_logs_FRdata():
                 inner_dict[day_of_month] += 1
         dict_of_entries[door.entrance_id] = inner_dict
 
-    list_color = ['#0001ff', '#59fa67', '#fff138',
-                  '#e62600', '#dd3cc4', '#b7cb34',
-                  '#ff6600', '#22dc09', '#af040c']
+    list_color = ['#FF5900', '#FF9A00', '#116ED5',
+                  '#00D696', '#46B235', '#28867C',
+                  '#D78040', '#D13F49', '#FFC498']
 
     # largest structure, the value is a list of dictionaries
     monthly_dict = {'datasets': []}
@@ -368,7 +382,7 @@ def monthly_logs_FRdata():
                 y_value = entry.entrance_id
                 # getting the r_value from the dict_of_entries above
                 days = dict_of_entries.get(y_value)
-                r_value = (days.get(x_value))*10
+                r_value = (days.get(x_value))
                 # back to making the mini dictionary
                 mini_dict = {'x':x_value, 'y':y_value, 'r':r_value}
                 med_dict['data'].append(mini_dict)
@@ -386,8 +400,8 @@ def building_logs_data():
     month = int(month)
     #number of days in a month
     num_days = calendar.monthrange(year, month)[1]
-    start_date = datetime.date(year, month, 1)
-    end_date = datetime.date(year, month, num_days)
+    start_date = dt.date(year, month, 1)
+    end_date = dt.date(year, month, num_days)
 
     building_name = request.args.get('building')
     building_name = building_name.strip()
@@ -423,7 +437,7 @@ def building_logs_data():
                 byday_dict[entrybybuilding.datentime.date().day] = byhour_dict
             dict_of_entries[entrybybuilding.entrance_id] = byday_dict
     
-    list_color = ['#0001ff', '#59fa67', '#fff138']
+    list_color = ['#28867C', '#46B235']
 
     # largest structure, the value is a list of dictionaries
     building_dict = {'datasets': []}
@@ -463,8 +477,8 @@ def building_logs_FRdata():
     month = int(month)
     #number of days in a month
     num_days = calendar.monthrange(year, month)[1]
-    start_date = datetime.date(year, month, 1)
-    end_date = datetime.date(year, month, num_days)
+    start_date = dt.date(year, month, 1)
+    end_date = dt.date(year, month, num_days)
 
     building_name = request.args.get('building')
     building_name = building_name.strip()
@@ -483,10 +497,10 @@ def building_logs_FRdata():
 
     # hirarchy: dict_of_entries > entrace_dict > byday_dict > byhour_dict
     # filtering all entries by the month and building specified
-    entriesbybuilding = (Entries.query.filter(Entries.building_id==building_id,
-                                              Entries.entrance_id==door_choosen,
-                                              Entries.datentime >= start_date,
-                                              Entries.datentime <= end_date).all())
+    entriesbybuilding = (Recognized.query.filter(Recognized.building_id==building_id,
+                                              Recognized.entrance_id==door_choosen,
+                                              Recognized.datentime >= start_date,
+                                              Recognized.datentime <= end_date).all())
 
     # doorsinbuilding = Entrance.query.filter_by(building_id=building_id).all()
 
@@ -500,7 +514,7 @@ def building_logs_FRdata():
                 byday_dict[entrybybuilding.datentime.date().day] = byhour_dict
             dict_of_entries[entrybybuilding.entrance_id] = byday_dict
     
-    list_color = ['#0001ff', '#59fa67', '#fff138']
+    list_color = ['#28867C', '#46B235']
 
     # largest structure, the value is a list of dictionaries
     building_dict = {'datasets': []}
@@ -557,6 +571,14 @@ def move_animated_to_process():
     return jsonify(emp_jsn)
 
 
+@app.route('/about')
+def about_page():
+# shows an About page
+    print "HHHIIIIIIII"
+
+    return render_template('about.html')
+
+
 #  ------------------------ Demo routes  ---------------------------- 
 #  ------------------------ Demo routes  ---------------------------- 
 @app.route('/demo_display_API')
@@ -564,12 +586,17 @@ def show_demo_nestcam_gifs():
     # for demo only, shows live API served .gifs
 
     list_img_files = []
+    list_evt_time = []
 
     for img_file in os.listdir('/home/vagrant/src/fr_project/thing/static/demoAPI'):
         if img_file.endswith('.gif'):
             list_img_files.append(img_file)
-    
-    return render_template('demoNestAPI.html', list_img_files=list_img_files)
+            dttm = img_file[:-4]
+            dttm_obj = datetime.strptime(dttm, '%Y-%m-%d-%H-%M-%S')
+            people_dttm = dttm_obj.strftime("%b %d %Y %r")
+            list_evt_time.append(people_dttm)
+
+    return render_template('demoNestAPI.html', list_img_dttm=zip(list_img_files, list_evt_time))
 
 
 @app.route('/demo_faces')
@@ -577,12 +604,17 @@ def show_demo_faces():
     # for demo only, shows Demo pictures
 
     list_img_files = []
+    list_evt_time = []
 
     for img_file in os.listdir('/home/vagrant/src/fr_project/thing/static/demoFaces'):
         if img_file.endswith('.jpg'):
             list_img_files.append(img_file)
+            dttm = img_file[:-4]
+            dttm_obj = datetime.strptime(dttm, '%Y-%m-%d-%H-%M-%S')
+            people_dttm = dttm_obj.strftime("%b %d %Y %r")
+            list_evt_time.append(people_dttm)
     
-    return render_template('demofaces.html', list_img_files=list_img_files)
+    return render_template('demofaces.html', list_img_dttm=zip(list_img_files, list_evt_time))
 
 
 @app.route('/demo_FR')
@@ -590,14 +622,56 @@ def show_demo_fr():
     # for demo only, sends over the pictures to OpenFace
     img_files = []
 
+
     for img_file in os.listdir('/home/vagrant/src/fr_project/thing/static/demoFaces'):
         if img_file.endswith('.jpg'):
             img_files.append(img_file)
+    if img_files:
+        for each_img in img_files:
+            os.chdir('/home/vagrant/src/fr_project')
+            os.system("python -m thing.openface-master.demos.classifier infer thing/openface-master/classifier0823.pkl thing/static/demoFaces/"+each_img)
+        return redirect('/demo_FR_display')
+    else:
+        return redirect('/demo_FR_display')
 
-    for each_img in img_files:
-        os.chdir('/home/vagrant/src/fr_project')
-        os.system("python -m thing.openface-master.demos.classifier infer thing/openface-master/classifier0823.pkl thing/static/demoFaces/"+each_img)
-        # need to make a demo infer function or something so that it writes to the fake DB
+@app.route('/demo_FR_display')
+def show_demo_fr_display():
+    # for demo only, displays the result of OpenFace
+    imgs_passed = []
+    names_passed = []
+    conf_passed = []
+    list_evt_time_passed = []
+    imgs_failed = []
+    names_conf_failed = []
+    list_evt_time_failed = []
+
+    for img_file1 in os.listdir('/home/vagrant/src/fr_project/thing/static/demoPassed'):
+        if img_file1.endswith('.jpg'):
+            imgs_passed.append(img_file1)
+            dttm = img_file1[:-4]
+            dttm_obj = datetime.strptime(dttm, '%Y-%m-%d-%H-%M-%S')
+            recognized = Recognized.query.filter(Recognized.datentime==dttm_obj).first()
+            # info = "Likely name: %s   Confidence level: %.2f"%(recognized.person.person_name, recognized.conf_lvl)
+            # print "info___", info
+            names_passed.append(recognized.person.person_name)
+            conf_passed.append(recognized.conf_lvl)
+            people_dttm = dttm_obj.strftime("%b %d %Y %r")
+            list_evt_time_passed.append(people_dttm)
+
+    for img_file2 in os.listdir('/home/vagrant/src/fr_project/thing/static/demoMnChk'):
+        if img_file2.endswith('.jpg'):
+            imgs_failed.append(img_file2)
+            dttm = img_file2[:-4]
+            dttm_obj = datetime.strptime(dttm, '%Y-%m-%d-%H-%M-%S')
+            people_dttm = dttm_obj.strftime("%b %d %Y %r")
+            list_evt_time_failed.append(people_dttm)
+
+    return render_template('demoProcessed.html', 
+                           list_img_dttm_passed=zip(imgs_passed, list_evt_time_passed, names_passed, conf_passed),
+                           list_img_dttm_failed=zip(imgs_failed, list_evt_time_failed))
+
+
+
 
 
 
