@@ -1,18 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
 
-Welcome to Adgnosco.
-<br>
-<br>
+{% for flash in get_flashed_messages() %}
+    <div class="alert alert-danger" role="alert">{{ flash }}</div>
+{% endfor %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-offset-4 col-xs-12">
 
-<div>
-    <form action="/login" method="POST">
-        Personnel ID: <input type="number" name="username"><br>
-        Keycode: <input type="password" name="password"><br>
-        <input type="submit" value="login">
-    </form><br>
-    If you are a new user, please ask your building administrator for an account. 
+        </div>
+    </div>
 </div>
 
 
 {% endblock %}
+
+<section class="col-xs-12 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3" id="splash">
+    <p>Welcome to Adgnosco.</p>
+    <div>
+        <form action="/login" method="POST">
+            Personnel ID: <input type="number" name="username"><br>
+            Keycode: <input type="password" name="password"><br>
+            <input type="submit" value="login">
+        </form><br>
+        <p>If you are a new user, please ask your building administrator for an account.</p>
+    </div>
+</section>

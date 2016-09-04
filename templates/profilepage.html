@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
+{% if "user_id" in session  %}
 
-<p> displays the profile details of the person who logged in </p>
+{% for flash in get_flashed_messages() %}
+  <div class="alert alert-success" role="alert">{{ flash }}</div>
+{% endfor %}
 
-<p> create some sort of security so that they can't access willy nilly</p>
+
 <h3> Profile </h3>
 <div>
     Name: {{ user.person_name }}<br>
@@ -15,15 +18,15 @@
     <form action='/opensesame'>
         <input type="submit" value="Use keyless entry">
     </form>
-    <form action='/entries'>
-        <input type="submit" value="View entry logs">
-    </form>
 </div>
 <br>
 <br>
 <br>
 <div>
-IF YOU ARE A MANAGER!!!
+    {% if user.manager == True %}
+     <form action='/entries'>
+        <input type="submit" value="View entry logs">
+    </form>
     <form action='/register'>
         Personnel ID: <input type="number" name="username"><br>
         Keycode: <input type="number" name="password"><br>
@@ -31,6 +34,7 @@ IF YOU ARE A MANAGER!!!
         Manager? <input type="checkbox" name="manager" value="True">
         <input type="submit" value="Register new account">
     </form>
+    {% endif %}
 
-
+{% endif %}
 {% endblock %}

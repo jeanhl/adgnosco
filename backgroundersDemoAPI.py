@@ -5,23 +5,7 @@ import json
 import urllib
 import dateutil.parser
 import datetime
-# from flask import Flask, render_template, request, flash, redirect, session, jsonify
-# from flask_debugtoolbar import DebugToolbarExtension
 
-# app = Flask(__name__)
-
-# app.secret_key = "some secret"
-
-
-# stop_me = False
-# @app.route('/')
-# def index():
-#     """Homepage."""
-
-#     return render_template("homepage.html")
-
-
-# @app.route('/start')
 def get_nest_api():
 
     global stop_me
@@ -34,14 +18,13 @@ def get_nest_api():
 
 
     for chunk in result.iter_lines():
-        print chunk[:6]
+        print chunk[6:]
         imgs_to_del=[]
         for img_file in os.listdir('/home/vagrant/src/fr_project/thing/static/demoAPI'):
             if img_file.endswith('.gif'):
                 imgs_to_del.append(img_file)
         if len(imgs_to_del) > 10:
-            for each_img in imgs_to_del[:-10]:
-                print each_img   
+            for each_img in imgs_to_del[:-10]: 
                 os.chdir('/home/vagrant/src/fr_project/thing/static/demoAPI')
                 os.system("rm " + each_img)
 
@@ -62,24 +45,7 @@ def get_nest_api():
             print "when: ", timestampy        
 
             # --- This is for the demo, where we only display the .gifs to see that the Nest API works ---
-            # os.chdir('/home/vagrant/src/fr_project/thing/stillCaptured')
-            # urllib.urlretrieve(still_image, current_datetime_str+'.jpg')
             os.chdir('/home/vagrant/src/fr_project/thing/static/demoAPI')
             urllib.urlretrieve(animated_image, current_datetime_str+'.gif')
 
 get_nest_api()
-# @app.route('/stop')
-# def stop_nesting():
-#     global stop_me
-#     stop_me = True
-
-
-# if __name__ == "__main__":
-#     # We have to set debug=True here, since it has to be True at the point
-#     # that we invoke the DebugToolbarExtension
-
-#     # Do not debug for demo
-#     app.debug = True
-#     DebugToolbarExtension(app)
-#     app.run(host='0.0.0.0', port=5000)
-#             

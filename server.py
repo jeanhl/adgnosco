@@ -76,6 +76,9 @@ def controls_the_Nest_Streaming_API():
 def index():
     """Homepage."""
 
+    if "user_id" in session:
+        del session["user_id"]
+
     return render_template("homepage.html")
 
 
@@ -106,6 +109,7 @@ def login_process():
 
     # user is in database. Log them in and add them to the session
     session["user_id"] = user.person_id
+    print session
 
     flash("Logged in successfully")
     return redirect('/profilepage')
@@ -114,7 +118,7 @@ def login_process():
 @app.route('/logout')
 def logout_process():
     """Logs user out"""
-
+    del session["user_id"]
 
     return redirect('/')
 
@@ -122,6 +126,10 @@ def logout_process():
 @app.route('/profilepage', methods=['GET'])
 def profile_page():
     """Shows user profile page."""
+
+    if 'user_id' not in session:
+        flash("You must be logged in to view this page")
+        return redirect('/')
 
     # only shows the profile of whoever is in the session
     person_id = session['user_id']
@@ -133,6 +141,10 @@ def profile_page():
 @app.route('/register', methods=['POST'])
 def register_process():
     """Processes a registration form."""
+
+    if 'user_id' not in session:
+        flash("You must be logged in to view this page")
+        return redirect('/')
 
     # gets the information from the register form
     # adds the information to the database with checks
@@ -156,6 +168,9 @@ def register_process():
 @app.route('/opensesame')
 def show_keyless_entry():
     """ Shows the template for keyless entry """
+    if 'user_id' not in session:
+        flash("You must be logged in to view this page")
+        return redirect('/')
 
     return render_template('keyless.html')
 
@@ -221,6 +236,9 @@ def keyless_entry():
 def show_entries():
     """Shows the entries of the user selected"""
     # person_id = session['user_id']
+    if 'user_id' not in session:
+        flash("You must be logged in to view this page")
+        return redirect('/')
 
     available_months = set()
     available_buildings = set()
@@ -289,7 +307,7 @@ def monthly_logs_data():
                 inner_dict[day_of_month] += 1
         dict_of_entries[door.entrance_id] = inner_dict
 
-    list_color = ['#FF5900', '#FF9A00', '#116ED5',
+    list_color = ['rgba(255, 99, 132, 0.2)', '#FF9A00', '#116ED5',
                   '#00D696', '#46B235', '#28867C',
                   '#D78040', '#D13F49', '#FFC498']
 
@@ -545,7 +563,11 @@ def building_logs_FRdata():
 
 @app.route('/manual_review')
 def show_page_for_manual_review():
-    # this is to pass over the .gif files that could not be verified by facial recognition
+    """this is to pass over the .gif files that could not be verified by facial recognition"""
+
+    if 'user_id' not in session:
+        flash("You must be logged in to view this page")
+        return redirect('/')
 
     list_img_files = []
 
@@ -573,9 +595,7 @@ def move_animated_to_process():
 
 @app.route('/about')
 def about_page():
-# shows an About page
-    print "HHHIIIIIIII"
-
+    """shows an About page"""
     return render_template('about.html')
 
 
@@ -583,7 +603,10 @@ def about_page():
 #  ------------------------ Demo routes  ---------------------------- 
 @app.route('/demo_display_API')
 def show_demo_nestcam_gifs():
-    # for demo only, shows live API served .gifs
+    """ for demo only, shows live API served .gifs """
+    if 'user_id' not in session:
+        flash("You must be logged in to view this page")
+        return redirect('/')
 
     list_img_files = []
     list_evt_time = []
@@ -601,7 +624,11 @@ def show_demo_nestcam_gifs():
 
 @app.route('/demo_faces')
 def show_demo_faces():
-    # for demo only, shows Demo pictures
+    """ for demo only, shows Demo pictures """
+
+    if 'user_id' not in session:
+        flash("You must be logged in to view this page")
+        return redirect('/')
 
     list_img_files = []
     list_evt_time = []
@@ -619,7 +646,11 @@ def show_demo_faces():
 
 @app.route('/demo_FR')
 def show_demo_fr():
-    # for demo only, sends over the pictures to OpenFace
+    """ for demo only, sends over the pictures to OpenFace """
+    if 'user_id' not in session:
+        flash("You must be logged in to view this page")
+        return redirect('/')
+
     img_files = []
 
 
@@ -636,7 +667,12 @@ def show_demo_fr():
 
 @app.route('/demo_FR_display')
 def show_demo_fr_display():
-    # for demo only, displays the result of OpenFace
+    """ for demo only, displays the result of OpenFace """
+
+    if 'user_id' not in session:
+        flash("You must be logged in to view this page")
+        return redirect('/')
+
     imgs_passed = []
     names_passed = []
     conf_passed = []
