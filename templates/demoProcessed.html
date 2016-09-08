@@ -1,23 +1,40 @@
 {% extends 'base.html' %}
 {% block content %}
-<div>
-    <p> After passing the images through OpenFace, these people are recognized as residents of this complex. </p>
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h2 class="panel-title">After passing the images through OpenFace, these people are recognized as residents of this complex.</h2>
+  </div>
+  <div class="panel-body">
     {% for img, dttm, name, conf in list_img_dttm_passed %}
-    <img class='photosForReview' src= {{ url_for('static', filename = 'demoPassed/'+img) }} id={{img}} width="200"> <br>
-    Detection Time: {{dttm}} <br>
-    Resident Name: {{ name }} <br>
-    Recognition Confidence Level: {{conf*100}}%<br>
-    <br>
+    <div class="col-sm-3">
+        <div class="row">
+            <img src= {{ url_for('static', filename = 'demoPassed/'+img) }} id={{img}} width="300" class="img-thumbnail" >
+        </div>
+        <div class="animatedCaptions"><b>Detection Time: </b>{{dttm}}</div>
+        <div class="animatedCaptions"><b>Resident Name: </b>{{ name }}</div>
+        <div class="animatedCaptions"><b>Recognition Confidence Level: </b>{{conf*100}}%</div>
+    </div>
+
     {% endfor %}
+  </div>
 </div>
-<br>
-<br>
-<div>
-    <p> These visitors are not not found in the database, please review these events. </p>
+
+<div class="panel panel-danger">
+  <div class="panel-heading">
+    <h2 class="panel-title">These visitors are not not found in the database, please review these events.</h2>
+  </div>
+  <div class="panel-body">
     {% for img, dttm in list_img_dttm_failed %}
-    <img class='photosForReview' src= {{ url_for('static', filename = 'demoMnChk/'+img) }} id={{img}} width="200">
-    {{dttm}}
-    <br>
+    <div class="col-sm-3">
+        <div class="row">
+            <img src= {{ url_for('static', filename = 'demoMnChk/'+img) }} id={{img}} width="300" class="img-thumbnail" >
+        </div>
+        <div class="animatedCaptions"><b>Detection Time: </b>{{dttm}}</div>
+    </div>
     {% endfor %}
+  </div>
 </div>
 {% endblock %}
+
+

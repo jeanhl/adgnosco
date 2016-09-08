@@ -687,8 +687,6 @@ def show_demo_fr_display():
             dttm = img_file1[:-4]
             dttm_obj = datetime.strptime(dttm, '%Y-%m-%d-%H-%M-%S')
             recognized = Recognized.query.filter(Recognized.datentime==dttm_obj).first()
-            # info = "Likely name: %s   Confidence level: %.2f"%(recognized.person.person_name, recognized.conf_lvl)
-            # print "info___", info
             names_passed.append(recognized.person.person_name)
             conf_passed.append(recognized.conf_lvl)
             people_dttm = dttm_obj.strftime("%b %d %Y %r")
@@ -716,11 +714,11 @@ if __name__ == "__main__":
     # that we invoke the DebugToolbarExtension
 
     # Do not debug for demo
-    app.debug = True
+    # app.debug = True
 
     connect_to_db(app)
 
     # Use the DebugToolbar
-    DebugToolbarExtension(app)
+    # DebugToolbarExtension(app)
 
     app.run(host='0.0.0.0', port=5000)

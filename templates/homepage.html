@@ -4,25 +4,40 @@
 {% for flash in get_flashed_messages() %}
     <div class="alert alert-danger" role="alert">{{ flash }}</div>
 {% endfor %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-xs-offset-4 col-xs-12">
 
-        </div>
-    </div>
+<form action="/login" method="POST" class="form-horizontal">
+<fieldset>
+
+<!-- Form Name -->
+<legend>Please log into your account:</legend>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="User ID">User ID</label>  
+  <div class="col-md-4">
+  <input id="User ID" name="username" type="number" class="form-control input-md" required="">
+  </div>
 </div>
+
+<!-- Password input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="KeyCode">KeyCode</label>
+  <div class="col-md-4">
+    <input id="KeyCode" name="password" type="password" class="form-control input-md" required="">
+  </div>
+</div>
+
+<!-- Button -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="login"></label>
+  <div class="col-md-4">
+    <button type="submit" id="login" name="login" class="btn btn-primary">Login</button>
+  </div>
+</div>
+
+</fieldset>
+</form>
 
 
 {% endblock %}
 
-<section class="col-xs-12 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3" id="splash">
-    <p>Welcome to Adgnosco.</p>
-    <div>
-        <form action="/login" method="POST">
-            Personnel ID: <input type="number" name="username"><br>
-            Keycode: <input type="password" name="password"><br>
-            <input type="submit" value="login">
-        </form><br>
-        <p>If you are a new user, please ask your building administrator for an account.</p>
-    </div>
-</section>

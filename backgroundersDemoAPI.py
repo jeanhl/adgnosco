@@ -18,13 +18,13 @@ def get_nest_api():
 
 
     for chunk in result.iter_lines():
-        print chunk[6:]
+        print chunk[:6]
         imgs_to_del=[]
         for img_file in os.listdir('/home/vagrant/src/fr_project/thing/static/demoAPI'):
             if img_file.endswith('.gif'):
                 imgs_to_del.append(img_file)
-        if len(imgs_to_del) > 10:
-            for each_img in imgs_to_del[:-10]: 
+        if len(imgs_to_del) > 12:
+            for each_img in imgs_to_del[:-12]: 
                 os.chdir('/home/vagrant/src/fr_project/thing/static/demoAPI')
                 os.system("rm " + each_img)
 

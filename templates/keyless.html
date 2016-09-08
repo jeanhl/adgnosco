@@ -1,11 +1,31 @@
 {% extends 'base.html' %}
 {% block content %}
+{% if "user_id" in session  %}
 
-Locate the door id of the door you are trying to enter.
+{% for flash in get_flashed_messages() %}
+  <div class="alert alert-danger" role="alert">{{ flash }}</div>
+{% endfor %}
 
-<form action='/keyless' method='POST'>
-    Door ID: <input type="number" name="doorid"><br>
-    Keycode: <input type="password" name="password"><br>
-    <input type="submit" value="Unlock">
-</form>
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h2 class="panel-title">Use DoorCode to Unlock Door</h2>
+  </div>
+  <div class="panel-body">
+
+    <form action='/keyless' method="POST">
+        <h4>Enter the door ID# and your keycode to enter:</h4>
+        <div class="form-group">
+          <div class="col-md-6">
+            Door ID: <input type="number" name="doorid"><br>
+            Keycode: <input type="password" name="password"><br><br>
+            <button type="submit" class="btn btn-primary">Unlock Door</button>
+          </div>
+        </div>
+    </form>
+   
+  </div>
+</div>
+
+{% endif %}
 {% endblock %}
+

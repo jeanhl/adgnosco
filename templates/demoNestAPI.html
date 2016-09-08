@@ -2,13 +2,19 @@
 {% block content %}
 
 
-<div>
-    <p> For this demo, we have these pictures that we got from the Nest API. </p>
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h2 class="panel-title">For this demo, we have these pictures that we got from the Nest API.</h2>
+  </div>
+  <div class="panel-body">
     {% for img, dttm in list_img_dttm %}
-    <img class='photosForReview' src= {{ url_for('static', filename = 'demoAPI/'+img) }} id={{img}} width="200">
-    {{dttm}}
-    <br>
+    <div class="col-sm-4 row">
+        <img src={{ url_for('static', filename = 'demoAPI/'+img) }} id={{img}} class="img-thumbnail">    
+        <div class="animatedCaptions"><b>Event Captured At: </b>{{dttm}}</div>
+        <p>   </p>
+    </div>
+
     {% endfor %}
-</div>
+  </div>
 
 {% endblock %}

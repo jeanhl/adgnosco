@@ -1,85 +1,113 @@
 {% extends 'base.html' %}
 {% block content %}
 <body>
-    <!-- A button to go to the page for manually reviewing events -->
-    <div>
-        <form action='/manual_review'>
-            <input type='submit' value='Manual Review Events' disabled=True>
-        </form>
+<!-- A button to go to the page for manually reviewing events -->
+<div class="panel-body">
+    <form action='/manual_review'>
+        <button type="submit" class="btn btn-primary" disabled=True>Manual Review Events</button>
+    </form>
+
+<!-- A button to go to the page for Facial Recognition Demo -->
+    <form action='/demo_faces'>
+        <button type="submit" class="btn btn-primary">Go To Demo Facial Recognition</button>
+    </form>
+    <form action='/demo_display_API'>
+        <button type="submit" class="btn btn-primary">Go To Demo Nest API</button>
+    </form>
+</div>
+
+<!-- This div is all about the monthly chart. Getting a specific month and displaying it -->
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h2 class="panel-title">View the Entry Logs by Month</h2>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+    <form>
+        <h4>Select the month which you'd like to view the log:</h4>
+        <div class="form-group">
+          <div class="col-md-6">
+            <label for="sel1">Month:</label>
+              <select class="form-control" name="month" id='monthChartmonth'>
+                <option value='none'></option>
+                {% for month in available_months %}
+                <option value={{ month }}> {{month}} </option>
+                {% endfor %}
+              </select>
+              <button id='submitformonthlychart' type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </div>
+    </form>
     </div>
-    <!-- A button to go to the page for Facial Recognition Demo -->
-    <div>
-        <form action='/demo_faces'>
-            <input type='submit' value='Go To Demo FR'>
-        </form>
-        <form action='/demo_display_API'>
-            <input type='submit' value='Go To Demo Nest API'>
-        </form>
-    </div>
-    <!-- This div is all about the monthly chart. Getting a specific month and displaying it -->
-    <div id='byMonthChart'>
-        <form>
-            Select the month which you'd like to view the log:
+    <div class="block">
+    <div class='monthly-chart'>
+        <div id='bubbleChartMonthdiv'>
             <br>
-            <select name="month" id='monthChartmonth'>
-              <option value='none'></option>
-              {% for month in available_months %}
-              <option value={{ month }}> {{month}} </option>
-              {% endfor %}
-            </select>
-            <input type='submit' id='submitformonthlychart'>
-        </form><br><br>
-        <div class='monthly-chart'>
-            <div id='bubbleChartMonthdiv'>
-                <p class='appearchartinfo' hidden=True> Keyless entries for the month by door id</p>
-                <canvas id='bubbleChartMonth'></canvas><br>
-            </div>
-            <div id='bubbleChartMonthFRdiv'>
-                <p class='appearchartinfo' hidden=True> Camera detected entries for the month by door id </p>
-                <canvas id='bubbleChartMonthFR'></canvas>
-            </div>
+            <h4 class='appearchartinfo' hidden=True> Keyless entries for the month by door id</h4>
+            <canvas id='bubbleChartMonth'></canvas><br>
+        </div>
+        <div id='bubbleChartMonthFRdiv'>
+            <h4 class='appearchartinfo' hidden=True> Camera detected entries for the month by door id </h4>
+            <canvas id='bubbleChartMonthFR'></canvas>
         </div>
     </div>
+  </div>
+
+</div>
+</div>
+
+
 
     <!-- This div is all about the building chart. Getting a specific month, building and door and displaying it -->
-    <div id='byBuildingChart'>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h2 class="panel-title">View the Detailed Entry Logs</h2>
+    </div>
+    <div class="panel-body">
+        <div class="row">
         <form>
-            Select the month, building and door id which you'd like to view the log (logs are viewable for the next 6 months). <br>
-            <!-- getting the month -->
-            Select month:
-            <select name="month" id='buildingChartmonth'>
-              <option value='none'></option>
-              {% for month in available_months %}
-              <option value={{ month }}> {{month}} </option>
-              {% endfor %}
-            </select>
-            <!-- getting the building -->
-            Select building:
-            <select name="building" id='buildingChartbuilding'>
-              <option value='none'></option>
-              {% for building in available_buildings %}
-              <option value={{ building }}> {{building}} </option>
-              {% endfor %}
-            </select>
-            <!-- getting the door AFTER it is populated by building -->
-            Select door:
-            <select name="door" id='buildingChartdoor'>
-            <option value='none'></option>
-            </select>
-            <!-- submit button for the whole form -->
-            <input type='submit' id='submitforbuildingchart'>
-        </form><br><br>
+            <h4>Select the month, building and door id which you'd like to view the log:</h4>
+            <div class="form-group">
+              <div class="col-md-6">
+                <label for="sel1">Month:</label>
+                  <select class="form-control" name="month" id='buildingChartmonth'>
+                    <option value='none'></option>
+                    {% for month in available_months %}
+                    <option value={{ month }}> {{month}} </option>
+                    {% endfor %}
+                  </select>
+                  <label for="sel1">Building:</label>
+                  <select class="form-control" name="building" id='buildingChartbuilding'>
+                    <option value='none'></option>
+                    {% for building in available_buildings %}
+                    <option value={{ building }}> {{building}} </option>
+                    {% endfor %}
+                  </select>
+                  <label for="sel1">Door ID#:</label>
+                  <select name="door" id='buildingChartdoor'>
+                    <option value='none'></option>
+                  </select>
+                  <button id='submitforbuildingchart' type="submit" class="btn btn-primary">Submit</button>
+              </div>
+            </div>
+         </form>
+        </div>
+    </div>
+   
+    <div class='block'>
         <div class='monthly-chart'>
             <div id='bubbleChartBuildingdiv'>
-                <p class='appearchartinfo2' hidden=True> Keyless entries for the month and building by the hour </p>
+                <h4 class='appearchartinfo2' hidden=True> Keyless entries for the month and building by the hour </h4>
                 <canvas id='bubbleChartBuilding'></canvas><br>
             </div>
             <div id='bubbleChartBuildingdiv2'>
-                <p class='appearchartinfo2' hidden=True> Camera detected entries for the month and building by the hour </p>
+                <h4 class='appearchartinfo2' hidden=True> Camera detected entries for the month and building by the hour </h4>
                 <canvas id='bubbleChartBuildingFR'></canvas><br>
             </div>
         </div>
     </div>
+</div>
+
 
     <!-- This the JS script that generates the charts-->
     <script>

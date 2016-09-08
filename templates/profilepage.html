@@ -7,34 +7,84 @@
 {% endfor %}
 
 
-<h3> Profile </h3>
-<div>
-    Name: {{ user.person_name }}<br>
-    ID: {{ user.person_id }}<br>
-    Managerial status: {{ user.manager }} 
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h2 class="panel-title">User Profile</h2>
+  </div>
+  <div class="panel-body">
+    <b>Name:</b> {{ user.person_name }}<br>
+    <b>ID:</b> {{ user.person_id }}<br><br>
+    <form action='/opensesame' class="form-horizontal">
+        <div class="form-group">
+          <div class="col-md-6">
+            <button type="submit" class="btn btn-primary">Use KeyCode</button>
+          </div>
+        </div>
+    </form>
+  </div>
 </div>
 
-<div>
-    <form action='/opensesame'>
-        <input type="submit" value="Use keyless entry">
-    </form>
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h2 class="panel-title">Manager's Access</h2>
 </div>
-<br>
-<br>
-<br>
-<div>
+  <div class="panel-body">
     {% if user.manager == True %}
-     <form action='/entries'>
-        <input type="submit" value="View entry logs">
-    </form>
-    <form action='/register'>
-        Personnel ID: <input type="number" name="username"><br>
-        Keycode: <input type="number" name="password"><br>
-        Name (First Last): <input type="text" name="name"><br>
-        Manager? <input type="checkbox" name="manager" value="True">
-        <input type="submit" value="Register new account">
-    </form>
+
+<form action="/register" class="form-horizontal">
+    <fieldset>
+    <!-- Form Name -->
+    <legend>Register a new User:</legend>
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-1 control-label" for="username">Personnel ID</label>  
+      <div class="col-md-4">
+      <input id="username" name="username" type="number" class="form-control input-md" required="">
+      </div>
+    </div>
+    <!-- Password input-->
+    <div class="form-group">
+      <label class="col-md-1 control-label" for="KeyCode">KeyCode</label>
+      <div class="col-md-4">
+        <input id="KeyCode" name="password" type="password" class="form-control input-md" required="">
+      </div>
+    </div>
+    <!-- Name input-->
+    <div class="form-group">
+      <label class="col-md-1 control-label" for="Name">Name (First Last):</label>
+      <div class="col-md-4">
+        <input id="name" name="name" type="text" class="form-control input-md" required="">
+      </div>
+    </div>
+    <!-- Managerial Status -->
+    <div class="form-group">
+      <label class="col-md-1 control-label" for="manager">Manager?</label>
+      <div class="col-md-1">
+        <input id="manager" name="manager" type="checkbox"  required="">
+      </div>
+    </div>
+    <!-- Button -->
+    <div class="form-group">
+     <div class="col-md-6">
+      <button type="submit" id="register" name="register" class="btn btn-primary">Register</button>
+     </div>
+    </div>
+
+    </fieldset>
+</form>
+
+<form action='/entries' class="form-horizontal">
+    <div class="form-group">
+      <div class="col-md-6">
+        <button type="submit" class="btn btn-primary">Use View Entry Logs</button>
+      </div>
+    </div>
+</form>
     {% endif %}
+  </div>
+</div>
+
 
 {% endif %}
 {% endblock %}
+
