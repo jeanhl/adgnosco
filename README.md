@@ -1,4 +1,5 @@
 # adgnosco
 Final project at HackBright
 
-Please watch this space for a readme update. 9/10/2016
+Please go here for more detailed explaination on Adgnosco 
+https://adgnosco.wordpress.com/
