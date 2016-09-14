@@ -32,15 +32,28 @@ sched = BackgroundScheduler()
 
 @sched.scheduled_job('interval', id='my_job_id', seconds=15)
 def my_interval_job():
+    """ scheduler that runs the script for feeding images to OpenFace.
+        Change the directory for non-demo version
+    """
     print "Scheduler toggled! ~~~~~~~~~~~~~~~~~"
-    # print 'Scheduler for facial recognition is running'
-    # os.chdir('/home/vagrant/src/fr_project')
-    # os.system("python -m thing.openface-master.demos.classifier infer thing/openface-master/classifier0823.pkl thing/openface-master/Yun1.jpg")
+
+    img_files = []
+
+    for img_file in os.listdir('/home/vagrant/src/fr_project/thing/static/demoFaces'):
+        if img_file.endswith('.jpg'):
+            img_files.append(img_file)
+    if img_files:
+        for each_img in img_files:
+            os.chdir('/home/vagrant/src/fr_project')
+            os.system("python -m thing.openface-master.demos.classifier infer thing/openface-master/classifier0823.pkl thing/static/demoFaces/"+each_img)
+        return redirect('/demo_FR_display')
+    else:
+        return redirect('/demo_FR_display')
 
 
 @app.route('/fr_call.json')
 def controls_the_feeding_of_imgs_into_OpenFace():
-# Scheduler Section for findng .jpg in a directory and feed them into OpenFace
+    """ Optional scheduler for finding .jpg in a directory and feed them into OpenFace."""
     fr_dict = {}
     fr_instruction = request.args.get('fr_instruction')
     fr_instruction = str(fr_instruction)
@@ -52,24 +65,6 @@ def controls_the_feeding_of_imgs_into_OpenFace():
         sched.shutdown()
 
     return jsonify(fr_dict)
-
-
-@app.route('/api_call.json')
-def controls_the_Nest_Streaming_API():
-# Starts or Stops the streaming of information from NestCam
-    api_dict = {}
-    api_instruction = request.args.get('api_instruction')
-    api_instruction = str(api_instruction)
-    api_instruction = api_instruction.strip()
-
-    if api_instruction == 'api_yes':
-        print "You have started Nest API"
-        get_nest_api()
-    else:
-        print "You will stop Nest API"
-        get_nest_api.quit()
-
-    return jsonify(api_dict)
 
 
 @app.route('/')
@@ -581,7 +576,7 @@ def show_page_for_manual_review():
 
 @app.route('/move_animated')
 def move_animated_to_process():
-# script that moves the gif to the Processed folder
+    """script that moves the gif to the Processed folder"""
     emp_jsn = {}
     photo_selected = request.args.get('photo')
 

@@ -243,6 +243,7 @@ def infer(args):
             # os.system("mv " + img[20:] + " /home/vagrant/src/fr_project/thing/stillCaptured/processed")
             # os.chdir("/home/vagrant/src/fr_project/thing/animatedCaptured/")
             # os.system("mv " + img[20:-4] + ".gif /home/vagrant/src/fr_project/thing/animatedCaptured/Processed")
+            # added in the Twilio code here but then I removed it for the demo. Easier to add it back in afterwards when the home-user version is being written.
         
         if isinstance(clf, GMM):
             dist = np.linalg.norm(rep - clf.means_[maxI])
