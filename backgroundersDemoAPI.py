@@ -7,8 +7,6 @@ import dateutil.parser
 import datetime
 
 def get_nest_api():
-
-    global stop_me
     access_token = os.environ['ACCESS_TOKEN']
     camera = os.environ['CAMERA']
     result = requests.get('https://developer-api.nest.com/?auth='+access_token, 
