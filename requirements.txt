@@ -32,7 +32,7 @@ funcsigs==1.0.2
 futures==3.0.5
 html5lib==0.999
 httplib2==0.8
-ipython==1.2.1
+ipython==7.16.3
 itsdangerous==0.24
 joblib==0.7.1
 jsonpatch==1.3
