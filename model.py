@@ -1,5 +1,7 @@
 """Models and database functions for access monitoring project."""
 
+"""Need some data to test the Graphql query"""
+
 from flask_sqlalchemy import SQLAlchemy
 
 # This is the connection to the PostgreSQL database; we're getting this through
